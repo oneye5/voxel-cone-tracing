@@ -45,7 +45,7 @@ std::string lsystem::iterate(const std::string &seed, const ruleset &rules, int 
 
 namespace lsystem::gui {
 	void rules_window(struct Data &data) {
-		ImGui::SetNextWindowPos(ImVec2(5, 205), ImGuiSetCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(310, 5), ImGuiSetCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiSetCond_Once);
 		ImGui::Begin("LSystem Rules", nullptr);
 
@@ -84,6 +84,16 @@ namespace lsystem::gui {
 			ImGui::Text("%s", rule_text.c_str());
 		}
 
+		ImGui::End();
+	}
+
+	void growth_window(struct Data &data) {
+		ImGui::SetNextWindowPos(ImVec2(5, 210), ImGuiSetCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiSetCond_Once);
+		ImGui::Begin("LSystem Growth", nullptr);
+
+		static int rule_idx = 0;
+		static std::string growth;
 		ImGui::End();
 	}
 }
