@@ -106,7 +106,7 @@ namespace lsystem::gui {
 
 		ImGui::SameLine();
 		static bool every_step = false;
-		ImGui::Checkbox("Debug", &every_step);
+		regrow |= ImGui::Checkbox("Debug", &every_step);
 
 		static int iterations = 3;
 		regrow |= ImGui::InputInt("Iterations", &iterations);
@@ -115,10 +115,15 @@ namespace lsystem::gui {
 
 		static vector<std::string> growth;
 		if (regrow || data.regrow) {
+			growth.clear();
 			if (!every_step) {
 				growth = {iterate(std::string{input_buf}, data.rules.value(), iterations)};
 			} else {
-
+				std::string cur = {input_buf};
+				for (int i = 0; i < iterations; i++) {
+					cur = iterate(cur, data.rules.value());
+					growth.push_back(cur);
+				}
 			}
 		}
 
