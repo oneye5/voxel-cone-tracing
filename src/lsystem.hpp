@@ -21,6 +21,7 @@ namespace lsystem {
 			std::string seed;
 			std::optional<ruleset> rules;
 			int interations;
+			bool regrow;
 		};
 		void rules_window(struct Data& data);
 		void growth_window(struct Data& data);

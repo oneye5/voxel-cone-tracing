@@ -121,7 +121,7 @@ void Application::renderGUI() {
 	// {{{ LSystem stuff
 	static lsystem::gui::Data ls_data;
 	lsystem::gui::rules_window(ls_data);
-	// lsystem::gui::growthWindow(ls_data);
+	lsystem::gui::growth_window(ls_data);
 	// }}}
 }
 
