@@ -58,6 +58,7 @@ namespace lsystem::gui {
 			if (rule_idx) {
 				std::ifstream file{available_rule_paths[rule_idx]};
 				data.rules = parse_rules(file);
+				data.regrow = true;
 
 				const auto& rules = data.rules.value();
 
@@ -77,6 +78,8 @@ namespace lsystem::gui {
 			} else {
 				data.rules.reset();
 			}
+		} else {
+			data.regrow = false;
 		}
 
 		if (data.rules) {
@@ -88,12 +91,42 @@ namespace lsystem::gui {
 	}
 
 	void growth_window(struct Data &data) {
-		ImGui::SetNextWindowPos(ImVec2(5, 210), ImGuiSetCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiSetCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(310, 210), ImGuiSetCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(350, 120), ImGuiSetCond_Once);
 		ImGui::Begin("LSystem Growth", nullptr);
 
-		static int rule_idx = 0;
-		static std::string growth;
+		if (!data.rules.has_value()) {
+			ImGui::Text("No rules loaded.");
+			ImGui::End();
+			return;
+		}
+
+		static char input_buf[512];
+		bool regrow = ImGui::InputText("Seed", input_buf, sizeof(input_buf));
+
+		ImGui::SameLine();
+		static bool every_step = false;
+		ImGui::Checkbox("Debug", &every_step);
+
+		static int iterations = 3;
+		regrow |= ImGui::InputInt("Iterations", &iterations);
+
+		if (iterations < 0) iterations = 0;
+
+		static vector<std::string> growth;
+		if (regrow || data.regrow) {
+			if (!every_step) {
+				growth = {iterate(std::string{input_buf}, data.rules.value(), iterations)};
+			} else {
+
+			}
+		}
+
+		for (const auto& s : growth) {
+			ImGui::Separator();
+			ImGui::TextWrapped("%s", s.c_str());
+		}
+
 		ImGui::End();
 	}
 }
