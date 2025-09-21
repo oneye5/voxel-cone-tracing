@@ -120,6 +120,7 @@ namespace lsystem::gui {
 				growth = {iterate(std::string{input_buf}, data.rules.value(), iterations)};
 			} else {
 				std::string cur = {input_buf};
+				growth.push_back(cur);
 				for (int i = 0; i < iterations; i++) {
 					cur = iterate(cur, data.rules.value());
 					growth.push_back(cur);
