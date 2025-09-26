@@ -42,6 +42,7 @@ public:
 
 	// rendering callbacks (every frame)
 	void render();
+	void onWindowResize();
 	void renderGUI();
 
 	// input callbacks

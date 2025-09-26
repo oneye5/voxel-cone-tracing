@@ -46,6 +46,13 @@ public:
     void resize(int w, int h) {
         width = w;
         height = h;
+
+        // reset
+        glDeleteFramebuffers(1, &fbo);
+        glDeleteTextures(gAttachments.size(), gAttachments.data());
+        glDeleteRenderbuffers(1, &depthRBO);
+
+        setupGBuffer();
     }
 
 private:

@@ -42,12 +42,13 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 
 
 void Application::render() {
-	
-	// retrieve the window hieght
 	int width, height;
-	glfwGetFramebufferSize(m_window, &width, &height); 
+	glfwGetFramebufferSize(m_window, &width, &height);  
+	if (width != m_windowsize.x || height != m_windowsize.y) {
+		m_windowsize = vec2(width, height); // update window size
+		onWindowResize();
+	}
 
-	m_windowsize = vec2(width, height); // update window size
 	glViewport(0, 0, width, height); // set the viewport to draw to the entire window
 
 	// clear the back-buffer
@@ -75,6 +76,9 @@ void Application::render() {
 	renderer->render(view, proj);
 }
 
+void Application::onWindowResize() {
+	renderer->resizeWindow(m_windowsize.x, m_windowsize.y);
+}
 
 void Application::renderGUI() {
 
@@ -97,16 +101,29 @@ void Application::renderGUI() {
 	ImGui::SameLine();
 	if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
 
-	
+#pragma region renderer params
 	ImGui::Separator();
+	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
+	ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
+	if (ImGui::Button("Voxel show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
+	if (ImGui::Button("Voxel show metallic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
+	if (ImGui::Button("Voxel show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
+	if (ImGui::Button("Voxel show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
+	if (ImGui::Button("Voxel show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
+	if (ImGui::Button("Voxel show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
 
-	// example of how to use input boxes
-	static float exampleInput;
-	if (ImGui::InputFloat("example input", &exampleInput)) {
-		cout << "example input changed to " << exampleInput << endl;
-	}
+	ImGui::Separator();
+	ImGui::Checkbox("Gbuffer debug enable", &renderer->debug_params.gbuffer_debug_mode_on);
+	if (ImGui::Button("Gbuffer show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
+	if (ImGui::Button("Gbuffer show metalic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
+	if (ImGui::Button("Gbuffer show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
+	if (ImGui::Button("Gbuffer show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
+	if (ImGui::Button("Gbuffer show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
+	if (ImGui::Button("Gbuffer show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
+	if (ImGui::Button("Gbuffer show emissive colorf as RGB")) { renderer->debug_params.debug_channel_index = 7; }
+	if (ImGui::Button("Gbuffer show 'spare channel' as RGB")) { renderer->debug_params.debug_channel_index = 8; }
+#pragma endregion
 
-	// finish creating window
 	ImGui::End();
 }
 

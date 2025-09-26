@@ -4,12 +4,10 @@
 #include <vct/gBufferLightingPass.hpp>
 #include <vct/voxelizer.hpp>
 
-struct debug_params {
+struct debug_parameters {
     bool voxel_debug_mode_on;
     float voxel_slice;
-
-    int debug_channel_index; // shared
-
+    int debug_channel_index; // shared channel index
     bool gbuffer_debug_mode_on;
 };
 
@@ -19,6 +17,7 @@ public:
     gBufferLightingPass* lightingPass; 
     Voxelizer* voxelizer;
     std::vector<Renderable*> renderables;
+    debug_parameters debug_params;
 
     Renderer(int width, int height) {
         prepass = new gBufferPrepass(width, height);
@@ -26,6 +25,12 @@ public:
         voxelizer = new Voxelizer(512);
         currentProj = glm::mat4(1);
         currentView = glm::mat4(1);
+    
+        // set params
+        debug_params.debug_channel_index = 0;
+        debug_params.gbuffer_debug_mode_on = false;
+        debug_params.voxel_debug_mode_on = false;
+        debug_params.voxel_slice = 0;
     }
 
     void addRenderable(Renderable* r) {
@@ -37,14 +42,25 @@ public:
     }
 
     void render(glm::mat4& view, glm::mat4& proj) {
+        cleanDebugParams();
         auto shaders = getShaders();
         auto modelMatricies = getModelMatricies();
         currentProj = proj;
         currentView = view;
 
         voxelizer->voxelize([&]() { drawAllWithoutSetUniforms(); }, modelMatricies, shaders);
+        if (debug_params.voxel_debug_mode_on) {
+            voxelizer->renderDebugSlice(debug_params.voxel_slice, debug_params.debug_channel_index);
+            return;
+        }
+
         prepass->executePrepass(shaders, [&]() {drawAll(); });
-        lightingPass->runPass();
+        lightingPass->runPass(debug_params.gbuffer_debug_mode_on ? debug_params.debug_channel_index : 0);
+    }
+
+    void cleanDebugParams() { // make sure the params make sense, eg. only one debug mode is on
+        if (debug_params.gbuffer_debug_mode_on && debug_params.voxel_debug_mode_on)
+            debug_params.gbuffer_debug_mode_on = false;
     }
 
     glm::mat4 currentView;
