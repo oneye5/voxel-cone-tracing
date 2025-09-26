@@ -15,7 +15,6 @@ public:
         prepass = new gBufferPrepass(width, height);
         lightingPass = new gBufferLightingPass(prepass);
         voxelizer = new Voxelizer(512);
-
         currentProj = glm::mat4(1);
         currentView = glm::mat4(1);
     }

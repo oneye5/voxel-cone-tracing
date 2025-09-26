@@ -15,35 +15,25 @@
 #include "cgra/cgra_image.hpp"
 #include "cgra/cgra_shader.hpp"
 #include "cgra/cgra_wavefront.hpp"
+#include <renderer.hpp>
+#include <example_renderable.cpp>
 
 
 using namespace std;
 using namespace cgra;
 using namespace glm;
 
-
-void basic_model::draw(const glm::mat4 &view, const glm::mat4 proj) {
-	mat4 modelview = view * modelTransform;
-	
-	glUseProgram(shader); // load shader and variables
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uModelViewMatrix"), 1, false, value_ptr(modelview));
-	glUniform3fv(glGetUniformLocation(shader, "uColor"), 1, value_ptr(color));
-
-	mesh.draw(); // draw
-}
-
+Renderer* renderer = nullptr;
+ExampleRenderable* exampleRenderable = nullptr;
 
 Application::Application(GLFWwindow *window) : m_window(window) {
-	
-	shader_builder sb;
-    sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//color_vert.glsl"));
-	sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//color_frag.glsl"));
-	GLuint shader = sb.build();
+	int width, height;
+	glfwGetFramebufferSize(m_window, &width, &height);
+	renderer = new Renderer(width, height);
 
-	m_model.shader = shader;
-	m_model.mesh = load_wavefront_data(CGRA_SRCDIR + std::string("/res//assets//teapot.obj")).build();
-	m_model.color = vec3(1, 0, 0);
+	// add all renderables
+	exampleRenderable = new ExampleRenderable();
+	renderer->addRenderable(exampleRenderable);
 }
 
 
@@ -77,10 +67,8 @@ void Application::render() {
 	if (m_show_grid) drawGrid(view, proj);
 	if (m_show_axis) drawAxis(view, proj);
 	glPolygonMode(GL_FRONT_AND_BACK, (m_showWireframe) ? GL_LINE : GL_FILL);
-
-
-	// draw the model
-	m_model.draw(view, proj);
+	
+	renderer->render(view, proj);
 }
 
 
