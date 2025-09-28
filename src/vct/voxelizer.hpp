@@ -27,6 +27,11 @@ public:
     void setResolution(int resolution);
     void setWorldSize(float worldSize);
     void setCenter(const glm::vec3& center);
+
+    GLuint m_voxelTex0; // normal + smoothness
+    GLuint m_voxelTex1; // albedo + emissiveFactor
+    GLuint m_voxelTex2; // emissive + metallic
+    VoxelParams m_params;
 private:
     // Initialization
     void initializeTextures();
@@ -41,12 +46,6 @@ private:
     // Helper methods
     glm::mat4 createOrthographicProjection() const;
     std::array<glm::mat4, 3> createOrthographicViews() const;
-
-    // OpenGL resources
-    GLuint m_voxelTex0; // normal + smoothness
-    GLuint m_voxelTex1; // albedo + emissiveFactor
-    GLuint m_voxelTex2; // emissive + metallic
-    VoxelParams m_params;
 private:
     GLuint m_voxelShader;
     GLuint m_debugShader;

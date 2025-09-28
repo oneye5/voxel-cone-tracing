@@ -14,8 +14,9 @@
 class gBufferLightingPass {
 public:
 	//int* debugModePtr = nullptr;
-	gBufferLightingPass(gBufferPrepass* prepassObj) {
+	gBufferLightingPass(gBufferPrepass* prepassObj, Voxelizer* voxelizerObj) {
 		prepass = prepassObj;
+		voxelizer = voxelizerObj;
 		//debugModePtr = &prepassObj->debugMode;
 		// setup shaders
 		cgra::shader_builder sb;
@@ -24,6 +25,11 @@ public:
 		shader = sb.build();
 
 		setupQuad();
+
+		glUseProgram(shader);
+		glUniform1i(glGetUniformLocation(shader, "voxelTex0"), 0);
+		glUniform1i(glGetUniformLocation(shader, "voxelTex1"), 1);
+		glUniform1i(glGetUniformLocation(shader, "voxelTex2"), 2);
 	}
 
 	~gBufferLightingPass() {
@@ -67,11 +73,23 @@ public:
 		glBindTexture(GL_TEXTURE_2D, prepass->getAttachment(3)); // Emissive
 		glUniform1i(glGetUniformLocation(shader, "gBufferEmissive"), 3);
 
+		// voxels
+		glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), m_params.resolution);
+		glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), m_params.worldSize);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_3D, voxelizer->m_voxelTex0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_3D, m_voxelTex1);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_3D, m_voxelTex2); // no binding needed, already done
+
 		// Draw fullscreen quad
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 private:
+	Voxelizer* voxelizer;
 	gBufferPrepass* prepass;
 	GLuint shader; 
 	GLuint quadVAO;

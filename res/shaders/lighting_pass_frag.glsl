@@ -7,8 +7,15 @@ uniform sampler2D gBufferPosition;
 uniform sampler2D gBufferNormal;
 uniform sampler2D gBufferAlbedo;    
 uniform sampler2D gBufferEmissive;
+
+uniform sampler3D voxelTex0; // Pos.xyz + Metallic
+uniform sampler3D voxelTex1; // Normal.xyz + Smoothness
+uniform sampler3D voxelTex2; // Albedo.rgb + EmissiveFactor
+
 uniform int uDebugIndex;
 
+uniform int uVoxelRes;
+uniform float uVoxelWorldSize;
 
 void main() {
     // unpack channels
