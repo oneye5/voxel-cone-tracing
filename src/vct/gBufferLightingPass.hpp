@@ -76,7 +76,6 @@ public:
 		// voxels
 		glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), voxelizer->m_params.resolution);
 		glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), voxelizer->m_params.worldSize);
-		glUniform1f(glGetUniformLocation(shader, "uVoxelCentre"), voxelizer->m_params.);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_3D, voxelizer->m_voxelTex0);
