@@ -74,15 +74,16 @@ public:
 		glUniform1i(glGetUniformLocation(shader, "gBufferEmissive"), 3);
 
 		// voxels
-		glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), m_params.resolution);
-		glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), m_params.worldSize);
+		glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), voxelizer->m_params.resolution);
+		glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), voxelizer->m_params.worldSize);
+		glUniform1f(glGetUniformLocation(shader, "uVoxelCentre"), voxelizer->m_params.);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_3D, voxelizer->m_voxelTex0);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_3D, m_voxelTex1);
+		glBindTexture(GL_TEXTURE_3D, voxelizer->m_voxelTex1);
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_3D, m_voxelTex2); // no binding needed, already done
+		glBindTexture(GL_TEXTURE_3D, voxelizer->m_voxelTex2); // no uniform setting needed, already done in constructor
 
 		// Draw fullscreen quad
 		glBindVertexArray(quadVAO);
