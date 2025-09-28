@@ -10,6 +10,7 @@
 #include "gBufferPrepass.hpp"
 #include <cgra/cgra_shader.hpp>
 #include <iostream>
+#include "voxelizer.hpp"
 
 class gBufferLightingPass {
 public:

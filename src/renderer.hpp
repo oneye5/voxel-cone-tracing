@@ -22,7 +22,7 @@ public:
     Renderer(int width, int height) {
         prepass = new gBufferPrepass(width, height);
         voxelizer = new Voxelizer(512);
-        lightingPass = new gBufferLightingPass(prepass, &voxelizer);
+        lightingPass = new gBufferLightingPass(prepass, voxelizer);
         currentProj = glm::mat4(1);
         currentView = glm::mat4(1);
     
