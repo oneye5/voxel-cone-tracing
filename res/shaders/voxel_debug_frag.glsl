@@ -1,4 +1,4 @@
-#version 430
+#version 440
 
 out vec4 FragColor;
 uniform sampler3D voxelTex0; // Pos.xyz + Metallic

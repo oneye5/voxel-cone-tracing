@@ -19,8 +19,8 @@ Voxelizer::Voxelizer(int resolution)
     , m_currentViewportWidth(0)
     , m_currentViewportHeight(0)
 {
-    initializeTextures();
     initializeShaders();
+    initializeTextures();
     initializeQuad();
     m_initialized = true;
 }
@@ -77,6 +77,11 @@ void Voxelizer::initializeTextures() {
     make3DTex(m_voxelTex0);
     make3DTex(m_voxelTex1);
     make3DTex(m_voxelTex2);
+
+    glUseProgram(m_debugShader);
+    glUniform1i(glGetUniformLocation(m_debugShader, "voxelTex0"), 0);
+    glUniform1i(glGetUniformLocation(m_debugShader, "voxelTex1"), 1);
+    glUniform1i(glGetUniformLocation(m_debugShader, "voxelTex2"), 2);
 }
 
 
@@ -233,6 +238,7 @@ void Voxelizer::renderDebugSlice(float sliceValue, int debugMode) {
     glBindTexture(GL_TEXTURE_3D, m_voxelTex1);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_3D, m_voxelTex2);
+
 
     glUniform1f(glGetUniformLocation(m_debugShader, "uSlice"), sliceValue);
 
