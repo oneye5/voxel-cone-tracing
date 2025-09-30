@@ -23,7 +23,7 @@ void Plant::grow(int steps) {
 
 void Plant::recalculate_mesh() {
 	cgra::mesh_builder mb;
-	static float angle = 0.7;
+	static float angle = 0.3;
 	float size = 1;
 	mb.mode = GL_LINES;
 	mat4 trans = mat4(1);
@@ -35,21 +35,34 @@ void Plant::recalculate_mesh() {
 				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
 				trans = translate(trans, {0, size/2.0, 0});
 				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
-				size *= 0.7;
+				size *= 0.8;
 
 				break;
 			case 'F': // Permanent growth
 				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
 				trans = translate(trans, {0, size, 0});
 				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
-				size *= 0.7;
+				size *= 0.8;
 
 				break;
-			case '-': // Rot back
+			case '-': // Rot back Z
 				trans = rotate(trans, -angle, {0,0,1});
 				break;
-			case '+': // Rot forward
+			case '+': // Rot forward Z
 				trans = rotate(trans, angle, {0,0,1});
+				break;
+
+			case '^': // Rot back X
+				trans = rotate(trans, -angle, {1,0,0});
+				break;
+			case '&': // Rot forward X
+				trans = rotate(trans, angle, {1,0,0});
+				break;
+			case '!': // Rot back Y
+				trans = rotate(trans, -angle, {0,1,0});
+				break;
+			case '?': // Rot forward Y
+				trans = rotate(trans, angle, {0,1,0});
 				break;
 			case '[': // Push matrix
 				stack.push_back({trans, size});
