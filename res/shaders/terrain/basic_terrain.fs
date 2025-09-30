@@ -102,7 +102,7 @@ vec3 getTerrainColor(vec2 uv, float height) {
 	}
 	// Rock to snow transition
 	else {
-		float t = smoothstep(rock_level - blend_range, 1.0, height);
+		float t = smoothstep(rock_level - blend_range, rock_level + blend_range, height); // NOTE - tweak this a bit cuz not the best transition
 		final_color = mix(rock_color, snow_color, t);
 	}
 
