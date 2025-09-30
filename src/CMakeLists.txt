@@ -13,6 +13,7 @@ add_executable(${CGRA_PROJECT} ${sources})
 # list your subdirectories here #
 # ----------------------------- #
 add_subdirectory(cgra)
+add_subdirectory(terrain)
 
 #########################################################
 # Link and Build Executable
@@ -27,6 +28,7 @@ target_compile_definitions(${CGRA_PROJECT} PRIVATE "-DCGRA_SRCDIR=\"${PROJECT_SO
 # Link usage requirements
 target_link_libraries(${CGRA_PROJECT} PRIVATE glew glfw ${GLFW_LIBRARIES})
 target_link_libraries(${CGRA_PROJECT} PRIVATE stb imgui)
+target_link_libraries(${CGRA_PROJECT} PRIVATE FastNoiseLite)
 
 # For experimental <filesystem>
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
