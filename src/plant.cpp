@@ -2,7 +2,11 @@
 #include "cgra/cgra_mesh.hpp"
 #include "lsystem.hpp"
 #include <string>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <vector>
 
 using namespace plant;
 using namespace glm;
@@ -19,10 +23,45 @@ void Plant::grow(int steps) {
 
 void Plant::recalculate_mesh() {
 	cgra::mesh_builder mb;
-	// Just for debugging atm
-	mb.push_index(mb.push_vertex({{0,0, 0}}));
-	mb.push_index(mb.push_vertex({{0,10, 0}}));
-	mb.push_index(mb.push_vertex({{0,0, 10}}));
+	static float angle = 0.7;
+	float size = 1;
+	mb.mode = GL_LINES;
+	mat4 trans = mat4(1);
+	std::vector<std::pair<mat4, float>> stack = {};
+	std::cout <<"Calculating for " << current << "\n";
+	for (const auto &c: current) {
+		switch (c) {
+			case 'A': // To-grow
+				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				trans = translate(trans, {0, size/2.0, 0});
+				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				size *= 0.7;
+
+				break;
+			case 'F': // Permanent growth
+				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				trans = translate(trans, {0, size, 0});
+				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				size *= 0.7;
+
+				break;
+			case '-': // Rot back
+				trans = rotate(trans, -angle, {0,0,1});
+				break;
+			case '+': // Rot forward
+				trans = rotate(trans, angle, {0,0,1});
+				break;
+			case '[': // Push matrix
+				stack.push_back({trans, size});
+				break;
+			case ']': // Pop matrix
+				const auto &last = stack.back();
+				size = last.second;
+				trans = last.first;
+				stack.pop_back();
+				break;
+		}
+	}
 
 	mesh = mb.build();
 }
