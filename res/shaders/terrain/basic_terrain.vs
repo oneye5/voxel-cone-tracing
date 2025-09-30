@@ -1,7 +1,8 @@
 #version 400 core
 
 uniform mat4 uProjectionMatrix;
-uniform mat4 uModelViewMatrix;
+uniform mat4 uModelMatrix;
+uniform mat4 uViewMatrix;
 uniform vec3 uColor;
 
 // Mesh stuff
@@ -54,14 +55,14 @@ void main() {
 	y_pos = clamp(y_pos, min_height, max_height);
 
 	vec3 pos = vec3(aPosition.x, y_pos, aPosition.z);
-
 	vec3 world_normal = calculateNormal(aTexCoord);
 	
-	v_out.position = (uModelViewMatrix * vec4(pos, 1)).xyz;
-	// v_out.normal = normalize((uModelViewMatrix * vec4(aNormal, 0)).xyz);
-	v_out.normal = normalize((uModelViewMatrix * vec4(world_normal, 0)).xyz);
+	v_out.position = (uModelMatrix * vec4(pos, 1.0)).xyz; // Use world normal
+	
+	mat4 modelView = uViewMatrix * uModelMatrix;
+	v_out.normal = normalize((modelView * vec4(world_normal, 0)).xyz);
 	v_out.textureCoord = aTexCoord;
 
 	// set the screenspace position (needed for converting to fragment data)
-	gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(pos, 1);
+	gl_Position = uProjectionMatrix * modelView * vec4(pos, 1);
 }
