@@ -44,6 +44,7 @@ uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
 uniform bool useTexturing; // whether or not to use texturing or just display the heightmap
+uniform bool useFakedLighting; // whether to use faked lighting, just until proper lighting is implemented
 
 const float TEX_BASE_SCALAR = 5.0f;
 
@@ -101,7 +102,7 @@ vec3 getTerrainColor(vec2 uv, float height) {
 	}
 	// Rock to snow transition
 	else {
-		float t = smoothstep(rock_level - blend_range, rock_level + blend_range, height);
+		float t = smoothstep(rock_level - blend_range, 1.0, height);
 		final_color = mix(rock_color, snow_color, t);
 	}
 
@@ -118,12 +119,31 @@ void main() {
 		col = vec3(height, height, height);
 	}
 
+	if (useFakedLighting) {
+		col = mix(vec3(height, height, height), col, 0.8);
+
+		// Calculate lighting
+		vec3 eye = normalize(vec3(1.5, 3.0, 2.0)); // faked light position
+		vec3 normal = normalize(f_in.normal);
+
+		// Diffuse lighting
+		float diffuse = max(dot(normal, eye), 0.0);
+
+		// Ambient + diffuse
+		float ambient = 0.8;
+		float light = ambient + diffuse;
+
+		// Apply lighting
+		col = col * light;
+
+	}
+
 	m.pos = f_in.position;
 	m.nrm = f_in.normal;
 	m.alb = col;
 	m.emi = vec3(0.0);
-	m.mtl = 0.5; // TODO - tweak these later, probs based on texture
-	m.smoothness = 0.5;
+	m.mtl = 0.2; // TODO - tweak these later, probs based on texture
+	m.smoothness = 0.8;
 	m.emiFac = 0.0;
 
 	writeRenderInfo(m);

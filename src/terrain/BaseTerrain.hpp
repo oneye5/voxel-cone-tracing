@@ -31,6 +31,8 @@ namespace Terrain {
 		GLuint rock_texture;
 		GLuint snow_texture;
 
+		bool useFakedLighting = false; // whether to use faked lighting for testing
+
 		void renderUI();
 		
 		BaseTerrain();

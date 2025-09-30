@@ -49,6 +49,7 @@ void BaseTerrain::draw() {
 	glUniform1f(glGetUniformLocation(shader, "max_height"), t_settings.max_height);
 	glUniform1f(glGetUniformLocation(shader, "min_height"), t_settings.min_height);
 	glUniform1i(glGetUniformLocation(shader, "useTexturing"), useTexturing);
+	glUniform1i(glGetUniformLocation(shader, "useFakedLighting"), useFakedLighting);
 	
 	glActiveTexture(GL_TEXTURE0);
 	// glUniform1i(glGetUniformLocation(shader, "heightMap"), 0);
@@ -119,6 +120,7 @@ void BaseTerrain::renderUI() {
 	ImGui::SliderFloat("Max Height", &t_settings.max_height, 0.20, 2.0);
 	ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
 	ImGui::Checkbox("Use procedural texturing", &useTexturing);
+	ImGui::Checkbox("Use faked lighting", &useFakedLighting);
 
 	if (ImGui::SliderInt("Plane Subdivisions", &plane_subs, 64, 1024)) {
 		changePlaneSubdivision(plane_subs);
