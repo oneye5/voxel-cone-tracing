@@ -34,12 +34,17 @@ BaseTerrain::BaseTerrain() {
 	glUniform1i(glGetUniformLocation(shader, "snow_texture"), 5);
 }
 
-void BaseTerrain::draw(glm::mat4 &view, const glm::mat4 proj) {
+void BaseTerrain::setProjViewUniforms(const glm::mat4 &view, const glm::mat4 &proj) const {
 	mat4 modelview = view * t_mesh.init_transform;
 
 	glUseProgram(shader);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
 	glUniformMatrix4fv(glGetUniformLocation(shader, "uModelViewMatrix"), 1, false, value_ptr(modelview));
+}
+
+
+void BaseTerrain::draw() {
+
 	glUniform3fv(glGetUniformLocation(shader, "uColor"), 1, value_ptr(vec3{1, 1, 1}));
 
 	glUniform1f(glGetUniformLocation(shader, "max_height"), t_settings.max_height);
@@ -137,4 +142,12 @@ void BaseTerrain::loadTextures() {
 	sand_texture = cgra::rgba_image(SAND_PATH).uploadTexture();
 	rock_texture = cgra::rgba_image(ROCK_PATH).uploadTexture();
 	snow_texture = cgra::rgba_image(SNOW_PATH).uploadTexture();
+}
+
+GLuint BaseTerrain::getShader() {
+	return shader;
+}
+
+mat4 BaseTerrain::getModelTransform() {
+	return t_mesh.init_transform;
 }

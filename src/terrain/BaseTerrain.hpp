@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Noise.hpp"
+#include "renderable.hpp"
 #include "cgra/cgra_mesh.hpp"
 
 namespace Terrain {
@@ -16,7 +17,7 @@ namespace Terrain {
 		glm::mat4 init_transform = glm::mat4(1.0f);
 	};
 	
-	class BaseTerrain {
+	class BaseTerrain : public Renderable {
 	public:
 		GLuint shader;
 		Noise t_noise; // The noise to use for the terrain, contains texture
@@ -34,13 +35,20 @@ namespace Terrain {
 		
 		BaseTerrain();
 
-		void draw(glm::mat4 &view, const glm::mat4 proj);
-
 		// Regenerate the plane mesh with a specific subdivision count
 		void changePlaneSubdivision(int subs);
+
+		GLuint getShader() override;
+
+		void setProjViewUniforms(const glm::mat4 &view, const glm::mat4 &proj) const override;
+
+		void draw() override;
+
+		glm::mat4 getModelTransform() override;
 
 	private:
 		// Load the textures for the terrain and store them in the fields
 		void loadTextures();
+
 	};
 }
