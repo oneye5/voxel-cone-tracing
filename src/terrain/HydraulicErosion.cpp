@@ -165,15 +165,15 @@ void HydraulicErosion::simulateDroplet() {
 		float capacity = std::max(-h_dif, settings.min_slope) * vel * water * settings.capacity_s;
 		
 
-		if (sediment > capacity) { // TODO - can also deposit here if height diff is 0 to erode flat terrain
+		if (sediment > capacity) {
 			// Deposit some sediment at point as above carry capacity
-			float amount_to_deposit = (sediment - capacity) * settings.deposition;
+			const float amount_to_deposit = (sediment - capacity) * settings.deposition;
 			sediment -= amount_to_deposit;
 			
 			applyErosion(pos_old.x, pos_old.y, amount_to_deposit, settings.erosion_radius);
 			
 		} else { // Steal some sediment from position and add it to particle sediment
-			float amount_to_erode = std::min((capacity - sediment) * settings.erode_speed, -h_dif);
+			const float amount_to_erode = std::min((capacity - sediment) * settings.erode_speed, -h_dif);
 			applyErosion(pos_old.x, pos_old.y, -amount_to_erode, settings.erosion_radius);
 			sediment += amount_to_erode;
 		}
