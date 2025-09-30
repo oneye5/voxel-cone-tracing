@@ -45,6 +45,9 @@ namespace Terrain {
 
 		void renderUI(bool use_own_window = false);
 
+		// Set the width and height of the simulation, should be followed by setting a new heightmap
+		void setSimulationDims(int w, int h);
+
 	private:
 		// Helper functions for erosion simulation
 		float getHeight(int x, int y) const;

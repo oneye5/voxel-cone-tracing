@@ -302,10 +302,11 @@ void Noise::changeTextureSize(int w, int h) {
 	height = h;
 	pixels.resize(width * height);
 	heightmap.resize(width * height);
-	// TODO - set erosion width and height
 
 	updatePixels();
 	createTexture();
+	erosionSim.setSimulationDims(width, height);
+	erosionSim.setHeightmap(heightmap);
 	// updateTexture();
 }
 

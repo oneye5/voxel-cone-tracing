@@ -239,3 +239,8 @@ void HydraulicErosion::renderUI(bool use_own_window) {
 
 	if (use_own_window) {ImGui::End();}
 }
+
+void HydraulicErosion::setSimulationDims(int w, int h) {
+	width = w;
+	height = h;
+}
