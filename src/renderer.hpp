@@ -49,6 +49,7 @@ public:
     }
 
     void render(glm::mat4& view, glm::mat4& proj) {
+        glDisable(GL_CULL_FACE);
         cleanDebugParams();
         auto shaders = getShaders();
         auto modelMatricies = getModelMatricies();
