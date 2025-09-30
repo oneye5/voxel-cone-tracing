@@ -207,8 +207,8 @@ void Noise::makeEditUI(bool use_own_window) {
 		}
 	}	
 	
-	static const float PREV_SIZE = 256;
-	ImGui::Image((ImTextureID)(intptr_t)texID, ImVec2(PREV_SIZE, PREV_SIZE));
+	// static const float PREV_SIZE = 256;
+	// ImGui::Image((ImTextureID)(intptr_t)texID, ImVec2(PREV_SIZE, PREV_SIZE));
 
 	if (use_own_window) {ImGui::End();}
 }

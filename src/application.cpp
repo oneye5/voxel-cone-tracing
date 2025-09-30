@@ -19,6 +19,8 @@
 #include <example_renderable.cpp>
 #include <point_light_renderable.cpp>
 
+#include "terrain/BaseTerrain.hpp"
+
 
 using namespace std;
 using namespace cgra;
@@ -28,6 +30,7 @@ Renderer* renderer = nullptr;
 
 ExampleRenderable* exampleRenderable  = nullptr;
 PointLightRenderable* light = nullptr;
+Terrain::BaseTerrain* t_terrain = nullptr;
 
 Application::Application(GLFWwindow *window) : m_window(window) {
 	int width, height;
@@ -35,13 +38,16 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 	renderer = new Renderer(width, height);
 
 	// add all renderables
-	exampleRenderable = new ExampleRenderable{};
+	// exampleRenderable = new ExampleRenderable{};
+	// renderer->addRenderable(exampleRenderable);
 	light = new PointLightRenderable();
 	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(2,10,2));
 	light->modelTransform = glm::scale(light->modelTransform, vec3(1));
 
-	renderer->addRenderable(exampleRenderable);
 	renderer->addRenderable(light);
+
+	t_terrain = new Terrain::BaseTerrain();
+	renderer->addRenderable(t_terrain);
 }
 
 bool dirtyVoxels = true;
@@ -135,6 +141,17 @@ void Application::renderGUI() {
 	if (ImGui::Button("Gbuffer show voxel sampled position as RGB")) { renderer->debug_params.debug_channel_index = 9; }
 #pragma endregion
 
+	ImGui::End();
+
+	// Terrain UI stuff
+	t_terrain->renderUI();
+
+	// standalone preview of the noise texture
+	static int tex_prev_size = 256;
+	ImGui::SetNextWindowPos(ImVec2(500, 5), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(tex_prev_size+32, tex_prev_size+42), ImGuiCond_Once);
+	ImGui::Begin("Texture preview", 0);
+	ImGui::Image((ImTextureID)(intptr_t)t_terrain->t_noise.texID, ImVec2(tex_prev_size, tex_prev_size));
 	ImGui::End();
 }
 
