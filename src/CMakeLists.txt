@@ -14,6 +14,7 @@ add_executable(${CGRA_PROJECT} ${sources})
 # ----------------------------- #
 add_subdirectory(cgra)
 add_subdirectory(terrain)
+add_subdirectory(vct)
 
 #########################################################
 # Link and Build Executable
