@@ -7,8 +7,10 @@
 namespace plant {
 	class Plant {
 		// TODO: Store like an rng or something
-		cgra::gl_mesh mesh;
-		GLuint shader;
+		cgra::gl_mesh trunk;
+		cgra::gl_mesh canopy;
+		GLuint trunk_shader;
+		GLuint canopy_shader;
 
 		lsystem::ruleset ruleset;
 		std::string seed;
@@ -17,7 +19,7 @@ namespace plant {
 		void recalculate_mesh();
 
 		public:
-		Plant(std::string seed, lsystem::ruleset ruleset, int steps = 0, GLuint shader = 0);
+		Plant(std::string seed, lsystem::ruleset ruleset, int steps = 0, GLuint trunk_shader = 0, GLuint canopy_shader = 0);
 		void grow(int steps = 1);
 		void draw(const glm::mat4 &modelTransform, const glm::mat4 &view, const glm::mat4 proj);
 	};

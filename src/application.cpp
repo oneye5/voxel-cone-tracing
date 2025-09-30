@@ -82,7 +82,7 @@ void Application::render() {
 	if (m_show_axis) drawAxis(view, proj);
 	glPolygonMode(GL_FRONT_AND_BACK, (m_showWireframe) ? GL_LINE : GL_FILL);
 
-	static plant::Plant myplant = plant::Plant("A", {{'A', "F[&[+A][--A]]???[^[+A][--A]]"}}, 2, m_model.shader);
+	static plant::Plant myplant = plant::Plant("A", {{'A', "F[&[+A][--A]]???[^[+A][--A]]"}}, 2, m_model.shader, m_model.shader);
 	plantref = &myplant;
 	myplant.draw(mat4(1), view, proj);
 	// draw the model

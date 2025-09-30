@@ -11,8 +11,8 @@
 using namespace plant;
 using namespace glm;
 
-Plant::Plant(std::string seed, lsystem::ruleset ruleset, int steps, GLuint shader)
-	: mesh{}, shader{shader}, ruleset{ruleset}, seed{seed}, current{seed} {
+Plant::Plant(std::string seed, lsystem::ruleset ruleset, int steps, GLuint trunk_shader, GLuint canopy_shader)
+	: trunk{}, canopy{}, trunk_shader{trunk_shader}, canopy_shader{canopy_shader}, ruleset{ruleset}, seed{seed}, current{seed} {
 	grow(steps);
 }
 
@@ -22,26 +22,29 @@ void Plant::grow(int steps) {
 }
 
 void Plant::recalculate_mesh() {
-	cgra::mesh_builder mb;
+	cgra::mesh_builder trunk_mb;
+	trunk_mb.mode = GL_LINES;
+	cgra::mesh_builder canopy_mb;
+	canopy_mb.mode = GL_LINES;
+
 	static float angle = 0.3;
 	float size = 1;
-	mb.mode = GL_LINES;
 	mat4 trans = mat4(1);
 	std::vector<std::pair<mat4, float>> stack = {};
 	std::cout <<"Calculating for " << current << "\n";
 	for (const auto &c: current) {
 		switch (c) {
 			case 'A': // To-grow
-				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				canopy_mb.push_index(canopy_mb.push_vertex({trans * vec4{0,0,0,1}, {0,0,1}}));
 				trans = translate(trans, {0, size/2.0, 0});
-				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				canopy_mb.push_index(canopy_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
 				size *= 0.8;
 
 				break;
 			case 'F': // Permanent growth
-				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
 				trans = translate(trans, {0, size, 0});
-				mb.push_index(mb.push_vertex({{trans * vec4{0,0,0,1}}}));
+				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
 				size *= 0.8;
 
 				break;
@@ -76,16 +79,24 @@ void Plant::recalculate_mesh() {
 		}
 	}
 
-	mesh = mb.build();
+	trunk = trunk_mb.build();
+	canopy = canopy_mb.build();
 }
 
 void Plant::draw(const glm::mat4 &modelTransform, const glm::mat4 &view, const glm::mat4 proj) {
 	mat4 modelview = view * modelTransform;
 	
-	glUseProgram(shader); // load shader and variables
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uModelViewMatrix"), 1, false, value_ptr(modelview));
-	glUniform3fv(glGetUniformLocation(shader, "uColor"), 1, value_ptr(vec3 {1.0, 1.0, 1.0}));
+	glUseProgram(trunk_shader); // load shader and variables
+	glUniformMatrix4fv(glGetUniformLocation(trunk_shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
+	glUniformMatrix4fv(glGetUniformLocation(trunk_shader, "uModelViewMatrix"), 1, false, value_ptr(modelview));
+	glUniform3fv(glGetUniformLocation(trunk_shader, "uColor"), 1, value_ptr(vec3 {0.8, 0.2, 0.0}));
 
-	mesh.draw();
+	trunk.draw();
+
+	glUseProgram(canopy_shader); // load shader and variables
+	glUniformMatrix4fv(glGetUniformLocation(canopy_shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
+	glUniformMatrix4fv(glGetUniformLocation(canopy_shader, "uModelViewMatrix"), 1, false, value_ptr(modelview));
+	glUniform3fv(glGetUniformLocation(canopy_shader, "uColor"), 1, value_ptr(vec3 {0.4, 1.0, 0.2}));
+
+	canopy.draw();
 }
