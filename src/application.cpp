@@ -49,6 +49,8 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 }
 
 
+plant::Plant *plantref;
+
 void Application::render() {
 	
 	// retrieve the window hieght
@@ -80,9 +82,8 @@ void Application::render() {
 	if (m_show_axis) drawAxis(view, proj);
 	glPolygonMode(GL_FRONT_AND_BACK, (m_showWireframe) ? GL_LINE : GL_FILL);
 
-
-
-	static plant::Plant myplant = plant::Plant("AB", {{'A', "AB"}}, 0, m_model.shader);
+	static plant::Plant myplant = plant::Plant("A", {{'A', "F[+A][-A]"}}, 2, m_model.shader);
+	plantref = &myplant;
 	myplant.draw(mat4(1), view, proj);
 	// draw the model
 	// m_model.draw(view, proj);
@@ -117,6 +118,10 @@ void Application::renderGUI() {
 	static float exampleInput;
 	if (ImGui::InputFloat("example input", &exampleInput)) {
 		cout << "example input changed to " << exampleInput << endl;
+	}
+
+	if (ImGui::Button("GROW")) {
+		plantref->grow();
 	}
 
 	// finish creating window
