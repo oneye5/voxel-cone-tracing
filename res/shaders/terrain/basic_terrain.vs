@@ -18,6 +18,7 @@ out VertexData {
 
 uniform float max_height;
 uniform float min_height;
+uniform float amplitude;
 
 uniform sampler2D heightMap; // The heightmap
 
@@ -50,7 +51,7 @@ vec3 calculateNormal(vec2 texCoord) {
 
 void main() {
 	// transform vertex data to viewspace
-	float height = texture(heightMap, aTexCoord).r;
+	float height = texture(heightMap, aTexCoord).r * amplitude;
 	float y_pos = max_height * height;
 	y_pos = clamp(y_pos, min_height, max_height);
 
