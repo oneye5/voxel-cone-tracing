@@ -86,29 +86,8 @@ void BaseTerrain::changePlaneSubdivision(int subs) {
 // with provided subdivisions
 static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub) {
 	PlaneTerrain plane;
-	cgra::mesh_builder mb;
+	cgra::mesh_builder mb = cgra::CREATE_PLANE(x_sub, z_sub);
 	
-	const float x_step = 1.0f / (float)x_sub;
-	const float z_step = 1.0f / (float)z_sub;
-	
-	for (float x = 0.0; x <= 1.0; x += x_step) {
-		for (float z = 0.0; z <= 1.0; z += z_step) {
-			mb.push_vertex({{x, 0.0, z}, {0.0, 1.0, 0.0}, {x, z}});
-		}
-	}
-
-	for (int z = 0; z < z_sub; z++) {
-		for (int x = 0; x < x_sub; x++) {
-			GLuint tl = z * (x_sub + 1) + x; // top left
-			GLuint tr = tl + 1;
-			GLuint bl = tl + (x_sub + 1);
-			GLuint br = bl + 1;
-
-			mb.push_indices({tl, tr, bl});
-			mb.push_indices({bl, tr, br});
-		}
-	}
-
 	plane.mesh = mb.build();
 	return plane;
 }

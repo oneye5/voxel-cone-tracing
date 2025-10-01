@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iostream>
 
 // stb
 #include <stb_image.h>
