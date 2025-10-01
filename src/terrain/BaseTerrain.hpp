@@ -9,6 +9,7 @@ namespace Terrain {
 	struct TerrainSettings {
 		float max_height = 1.0f; // Max height of the terrain
 		float min_height = 0.0; // Min height of the terrain
+		float amplitude = 1.0f; // Amplitude of the height generation
 	};
 
 	struct PlaneTerrain {
