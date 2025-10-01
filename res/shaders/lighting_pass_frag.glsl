@@ -26,6 +26,10 @@ vec3 worldToVoxel(vec3 pos) {
     return (pos / uVoxelWorldSize) + 0.5;
 }
 
+float calculateOcclusion(vec3 normal) { // we can estimate occlusion based off of the normal length, where 1 = full occlusion, 0.2 partial occlusion and ~0 = no occlusion
+    return length(normal);
+}
+
 int debugPass(vec3 worldPos, float metallic, vec3 worldNormal, float smoothness,
     vec3 albedo, float emissiveFactor, vec3 emissiveRgb, float spare) {
     if (uDebugIndex == 1)      FragColor = vec4(worldPos, 1.0);
@@ -37,10 +41,12 @@ int debugPass(vec3 worldPos, float metallic, vec3 worldNormal, float smoothness,
     else if (uDebugIndex == 7) FragColor = vec4(emissiveRgb, 1.0);
     else if (uDebugIndex == 8) FragColor = vec4(spare);
     else if (uDebugIndex == 9) FragColor = vec4(texture(voxelTex2, worldToVoxel(worldPos)).xyz, 1);
+    else if (uDebugIndex == 10) FragColor = vec4(vec3(calculateOcclusion(texture(voxelTex1, worldToVoxel(worldPos)).xyz)), 1);
     else return 0;
     return 1;
 }
-vec3 traceCone(vec3 origin, vec3 direction) {
+
+vec3 traceCone(vec3 origin, vec3 direction, float aperature) {
     vec3 accumulatedLight = vec3(0.0);
     float distance = VOXEL_SIZE * 3.0;
     for (int i = 0; i < MAX_STEPS; i++) {
@@ -48,13 +54,12 @@ vec3 traceCone(vec3 origin, vec3 direction) {
         vec3 sampleCoord = worldToVoxel(samplePos);
         if (any(lessThan(sampleCoord, vec3(0.0))) || any(greaterThan(sampleCoord, vec3(1.0))))
             break;
-
-        // calculate mip level based on cone diameter
-        float coneDiameter = distance * CONE_APERTURE;
+        float coneDiameter = distance * aperature;
         float mipLevel = clamp(log2(coneDiameter / VOXEL_SIZE), 0.0, 6.0);
         // sample voxel data
         vec4 voxelData = textureLod(voxelTex2, sampleCoord, mipLevel);
         float voxelEmissive = voxelData.a;
+
         // Accumulate emissive contribution
         if (voxelEmissive > EMISSIVE_THRESHOLD)
             accumulatedLight += voxelData.rgb * voxelEmissive;
@@ -81,7 +86,7 @@ vec3 sampleHemisphere(vec3 origin, vec3 normal) {
             normal * elevation
         );
         float weight = max(dot(direction, normal), 0.0);
-        vec3 coneLight = traceCone(origin, direction);
+        vec3 coneLight = traceCone(origin, direction, CONE_APERTURE);
         totalLight += coneLight * weight;
     }
     return totalLight / float(NUM_CONES) * BRIGHTNESS_MULTIPLIER;
@@ -105,7 +110,7 @@ void main() {
 
     // trace cone to gather direct emissive light
     vec3 directLight = sampleHemisphere(worldPos, worldNormal);
-    vec3 specular = traceCone(worldPos, worldNormal) * BRIGHTNESS_MULTIPLIER / 4;
+    vec3 specular = traceCone(worldPos, worldNormal, CONE_APERTURE) * BRIGHTNESS_MULTIPLIER / 4;
 
     // apply lighting to surface and add self-emissive
     vec3 outColor = albedo * (specular + directLight) + emissiveRgb * emissiveFactor + albedo * 0.1;

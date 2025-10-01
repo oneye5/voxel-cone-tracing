@@ -31,6 +31,7 @@ Renderer* renderer = nullptr;
 PointLightRenderable* light = nullptr;
 Terrain::BaseTerrain* t_terrain = nullptr;
 ExampleRenderable* exampleRenderable = nullptr;
+ExampleRenderable* exampleRenderable2 = nullptr;
 
 Application::Application(GLFWwindow *window) : m_window(window) {
 	int width, height;
@@ -41,6 +42,7 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 	t_terrain = new Terrain::BaseTerrain();
 	light = new PointLightRenderable();
 	exampleRenderable = new ExampleRenderable();
+	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
 	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(2.5,5,2.5));
@@ -49,10 +51,13 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(3, 3, 3));
 	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.5));
 
+	exampleRenderable2->mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//axis.obj")).build();
+	exampleRenderable2->modelTransform = glm::scale(glm::mat4(1), vec3(0.2,0.2,-0.2));
 	// add renderables
 	renderer->addRenderable(t_terrain);
 	renderer->addRenderable(light);
 	renderer->addRenderable(exampleRenderable);
+	renderer->addRenderable(exampleRenderable2);
 
 	// renderer tweaks based on scene size
 	renderer->voxelizer->setCenter(glm::vec3(2.5,2,2.5));
@@ -149,6 +154,7 @@ void Application::renderGUI() {
 	if (ImGui::Button("Gbuffer show emissive colorf as RGB")) { renderer->debug_params.debug_channel_index = 7; }
 	if (ImGui::Button("Gbuffer show 'spare channel' as RGB")) { renderer->debug_params.debug_channel_index = 8; }
 	if (ImGui::Button("Gbuffer show voxel sampled position as RGB")) { renderer->debug_params.debug_channel_index = 9; }
+	if (ImGui::Button("Gbuffer show voxel sampled occlusion as RGB")) { renderer->debug_params.debug_channel_index = 10; }
 #pragma endregion
 
 	ImGui::End();
