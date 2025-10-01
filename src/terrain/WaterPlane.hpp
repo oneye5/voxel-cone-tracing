@@ -15,11 +15,13 @@ namespace Terrain {
 		cgra::gl_mesh plane_mesh; // the plane mesh to draw with
 		GLuint shader = 0;
 		GLuint water_texture;
-		float water_height; // The height to render the water at
-		glm::mat4 init_transform = glm::mat4(1.0f); // Default init_transform, doesn't include water height offset
+		glm::mat4 model_transform = glm::mat4(1.0f); // Water model matrix, has height translation applied
 
 		explicit WaterPlane(GLuint texid = 0);
 
+		void update_transform(glm::vec3 model_scale, float sea_level);
+
+		// Renderable methods
 		GLuint getShader() override;
 		void setProjViewUniforms(const glm::mat4 &view, const glm::mat4 &proj) const override;
 		void draw() override;
