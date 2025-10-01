@@ -189,6 +189,7 @@ void HydraulicErosion::simulateDroplet() {
 
 void HydraulicErosion::simulate(int iterations) {
 	if (iterations == -1) iterations = settings.iterations;
+	// rng = std::mt19937(1337); // DEBUG - for if i want the same rng
 
 	for (int i = 0; i < iterations; i++) {
 		simulateDroplet();

@@ -50,6 +50,8 @@ void BaseTerrain::draw() {
 	glUniform1f(glGetUniformLocation(shader, "min_height"), t_settings.min_height);
 	glUniform1i(glGetUniformLocation(shader, "useTexturing"), useTexturing);
 	glUniform1i(glGetUniformLocation(shader, "useFakedLighting"), useFakedLighting);
+	glUniform1i(glGetUniformLocation(shader, "subdivisions"), plane_subs);
+	glUniform1f(glGetUniformLocation(shader, "amplitude"), t_settings.amplitude);
 	
 	glActiveTexture(GL_TEXTURE0);
 	// glUniform1i(glGetUniformLocation(shader, "heightMap"), 0);
@@ -119,6 +121,7 @@ void BaseTerrain::renderUI() {
 
 	ImGui::SliderFloat("Max Height", &t_settings.max_height, 0.20, 2.0);
 	ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
+	ImGui::SliderFloat("Amplitude", &t_settings.amplitude, 0.01f, 3.0f);
 	ImGui::Checkbox("Use procedural texturing", &useTexturing);
 	ImGui::Checkbox("Use faked lighting", &useFakedLighting);
 
@@ -133,8 +136,8 @@ void BaseTerrain::renderUI() {
 
 void BaseTerrain::loadTextures() {
 	static const std::string WATER_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//tex_Water.jpg");
-	static const std::string SAND_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//sand.png");
-	static const std::string GRASS_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//gras364.jpg");
+	static const std::string SAND_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//sand_2.png");
+	static const std::string GRASS_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//grass_2.jpg");
 	static const std::string ROCK_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//rock.jpg");
 	static const std::string SNOW_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//snow.jpg");
 
