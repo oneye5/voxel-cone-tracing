@@ -26,11 +26,12 @@ namespace Terrain {
 		FastNoiseLite::CellularReturnType cellular_return_type = FastNoiseLite::CellularReturnType_Distance; // Value that cellular function returns
 		float cellular_jitter = 1.0f; // Maximum distance a cellular point can move from grid pos
 
-		// Domain warp settings
+		// Domain warp settings (NOTE - i think i might be missing a few like fractal type)
 		bool use_domain_warp = false; // Whether or not to use domain warp
 		FastNoiseLite::DomainWarpType domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2; // domain warp algorithm
 		float domain_warp_amp = 1.0f; // Max warp distance from original pos
-		// TODO - copy the like frequency settings and stuff into here since domain warp needs separate
+		int domain_seed = 1337;
+		float domain_frequency = 0.005f;
 
 		// Print out settings in struct form to stdout
 		// TODO - add domain warp stuff
@@ -81,10 +82,17 @@ namespace Terrain {
 				{FastNoiseLite::CellularReturnType_Distance2Div, "FastNoiseLite::CellularReturnType_Distance2Div"}
 			};
 
+			static const std::map<FastNoiseLite::DomainWarpType, const char*> DOMAIN_WARP_TYPES = {
+				{FastNoiseLite::DomainWarpType_OpenSimplex2, "FastNoiseLite::DomainWarpType_OpenSimplex2"},
+				{FastNoiseLite::DomainWarpType_OpenSimplex2Reduced, "FastNoiseLite::DomainWarpType_OpenSimplex2Reduced"},
+				{FastNoiseLite::DomainWarpType_BasicGrid, "FastNoiseLite::DomainWarpType_BasicGrid"}
+			};
+
 			const char *fractal_type_str = FRACTAL_TYPES.at(fractal_type);
 			const char *noise_type_str = NOISE_TYPES.at(noise_type);
 			const char *cellular_dist_str = CELLULAR_DISTANCE_FUNCTIONS.at(cellular_dist_function);
 			const char *cellular_return_str = CELLULAR_RETURN_TYPES.at(cellular_return_type);
+			const char *domain_warp_type_str = DOMAIN_WARP_TYPES.at(domain_warp_type);
 
 			std::printf("NoiseSettings{\n");
 			// General settings
@@ -107,6 +115,12 @@ namespace Terrain {
 			std::printf("\t.cellular_dist_function = %s,\n", cellular_dist_str);
 			std::printf("\t.cellular_return_type = %s,\n", cellular_return_str);
 			std::printf("\t.cellular_jitter = %gf\n", cellular_jitter); // Last one shouldn't have a trailing comma
+
+			// Domain warp
+			std::printf("\t.domain_warp_type = %s,\n", domain_warp_type_str);
+			std::printf("\t.domain_warp_amp = %gf,\n", domain_warp_amp);
+			std::printf("\t.domain_seed = %d,\n", domain_seed);
+			std::printf("\t.domain_frequency = %gf,\n", domain_frequency);
 
 			// Print the closing brace
 			std::printf("};\n");

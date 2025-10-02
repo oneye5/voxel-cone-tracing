@@ -158,17 +158,9 @@ void Noise::makeEditUI(bool use_own_window) {
 			ImGui::EndCombo();
 		}
 
-		// TODO - temp, move these into settings later (but haven't used domain warp too much so it's fine for now :p)
-		static int warp_seed = 1338;
-		static float warp_freq = 0.005f;
-		settings_updated |= ImGui::DragInt("Warp Seed", &warp_seed, 1.0f, 1, 0);
-		settings_updated |= ImGui::SliderFloat("Warp Frequency", &warp_freq, 0.001f, 0.1f);
+		settings_updated |= ImGui::DragInt("Warp Seed", &settings.domain_seed, 1.0f, 1, 0);
+		settings_updated |= ImGui::SliderFloat("Warp Frequency", &settings.domain_frequency, 0.001f, 0.1f);
 		settings_updated |= ImGui::DragFloat("Warp Amplitude", &settings.domain_warp_amp, 1.0f, 0.0f, 300.0f);
-
-		if (settings_updated) {
-			domainWarp.SetSeed(warp_seed);
-			domainWarp.SetFrequency(warp_freq);
-		}
 	}
 
 	if (settings_updated) {
@@ -290,8 +282,11 @@ void Noise::updateNoiseFromSettings() {
 	noise.SetCellularReturnType(settings.cellular_return_type);
 	noise.SetCellularJitter(settings.cellular_jitter);
 
-	noise.SetDomainWarpType(settings.domain_warp_type);
-	noise.SetDomainWarpAmp(settings.domain_warp_amp);
+	domainWarp.SetSeed(settings.domain_seed);
+	domainWarp.SetFrequency(settings.domain_frequency);
+	domainWarp.SetDomainWarpType(settings.domain_warp_type);
+	domainWarp.SetDomainWarpAmp(settings.domain_warp_amp);
+
 }
 
 void Noise::setNoiseSettings(NoiseSettings new_settings) {
