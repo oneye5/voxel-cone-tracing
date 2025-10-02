@@ -20,6 +20,7 @@
 #include <point_light_renderable.cpp>
 
 #include "terrain/BaseTerrain.hpp"
+#include "terrain/WaterPlane.hpp"
 
 
 using namespace std;
@@ -31,6 +32,7 @@ Renderer* renderer = nullptr;
 PointLightRenderable* light = nullptr;
 Terrain::BaseTerrain* t_terrain = nullptr;
 ExampleRenderable* exampleRenderable = nullptr;
+Terrain::WaterPlane* t_water = nullptr;
 
 Application::Application(GLFWwindow *window) : m_window(window) {
 	int width, height;
@@ -39,6 +41,8 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 
 	
 	t_terrain = new Terrain::BaseTerrain();
+	// t_water = new Terrain::WaterPlane();
+	// t_terrain->water_plane = t_water;
 	light = new PointLightRenderable();
 	exampleRenderable = new ExampleRenderable();
 
@@ -51,6 +55,7 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 
 	// add renderables
 	renderer->addRenderable(t_terrain);
+	// renderer->addRenderable(t_water);
 	renderer->addRenderable(light);
 	renderer->addRenderable(exampleRenderable);
 
