@@ -19,6 +19,14 @@ namespace Terrain {
 
 		glm::mat4 init_transform = glm::mat4(1.0f);
 	};
+
+	struct Textures {
+		static GLuint water;
+		static GLuint sand;
+		static GLuint grass;
+		static GLuint rock;
+		static GLuint snow;
+	};
 	
 	class BaseTerrain : public Renderable {
 	public:
@@ -31,11 +39,12 @@ namespace Terrain {
 		int plane_subs = 512;
 		TerrainSettings t_settings;
 		bool useTexturing = true;
-		GLuint water_texture;
-		GLuint sand_texture;
-		GLuint grass_texture;
-		GLuint rock_texture;
-		GLuint snow_texture;
+		GLuint texture1; // The first texture, bottom most (default water)
+		GLuint texture2; // The second texture (default sand)
+		GLuint texture3; // Third texture (default dirt)
+		GLuint texture4; // Forth texture (default rock)
+		GLuint texture5; // Fifth texture (default snow)
+
 		WaterPlane* water_plane = nullptr; // The water plane (passed as pointer so renderer can draw it and terrain can set settings)
 
 		bool useFakedLighting = false; // whether to use faked lighting for testing

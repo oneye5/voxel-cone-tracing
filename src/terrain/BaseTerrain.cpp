@@ -12,6 +12,13 @@
 using namespace Terrain;
 using namespace glm;
 
+// TODO - not the nicest, maybe redo this lmao (why do i have to redefine them here...)
+GLuint Textures::water = 0;
+GLuint Textures::sand = 0;
+GLuint Textures::grass = 0;
+GLuint Textures::rock = 0;
+GLuint Textures::snow = 0;
+
 static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub);
 
 BaseTerrain::BaseTerrain() {
@@ -32,6 +39,7 @@ BaseTerrain::BaseTerrain() {
 	glUniform1i(glGetUniformLocation(shader, "grass_texture"), 3);
 	glUniform1i(glGetUniformLocation(shader, "rock_texture"), 4);
 	glUniform1i(glGetUniformLocation(shader, "snow_texture"), 5);
+
 }
 
 void BaseTerrain::setProjViewUniforms(const glm::mat4 &view, const glm::mat4 &proj) const {
@@ -59,19 +67,19 @@ void BaseTerrain::draw() {
 
 	// Water
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, water_texture);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 	// Sand
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, sand_texture);
+	glBindTexture(GL_TEXTURE_2D, texture2);
 	// Grass
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, grass_texture);
+	glBindTexture(GL_TEXTURE_2D, texture3);
 	// Rock
 	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, rock_texture);
+	glBindTexture(GL_TEXTURE_2D, texture4);
 	// Snow
 	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, snow_texture);
+	glBindTexture(GL_TEXTURE_2D, texture5);
 
 	t_mesh.mesh.draw();
 }
@@ -124,11 +132,17 @@ void BaseTerrain::loadTextures() {
 	static const std::string ROCK_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//rock.jpg");
 	static const std::string SNOW_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//snow.jpg");
 
-	water_texture = cgra::rgba_image(WATER_PATH).uploadTexture();
-	grass_texture = cgra::rgba_image(GRASS_PATH).uploadTexture();
-	sand_texture = cgra::rgba_image(SAND_PATH).uploadTexture();
-	rock_texture = cgra::rgba_image(ROCK_PATH).uploadTexture();
-	snow_texture = cgra::rgba_image(SNOW_PATH).uploadTexture();
+	Textures::water = cgra::rgba_image(WATER_PATH).uploadTexture();
+	Textures::sand = cgra::rgba_image(SAND_PATH).uploadTexture();
+	Textures::grass = cgra::rgba_image(GRASS_PATH).uploadTexture();
+	Textures::rock = cgra::rgba_image(ROCK_PATH).uploadTexture();
+	Textures::snow = cgra::rgba_image(SNOW_PATH).uploadTexture();
+
+	texture1 = Textures::water;
+	texture2 = Textures::sand;
+	texture3 = Textures::grass;
+	texture4 = Textures::rock;
+	texture5 = Textures::snow;
 }
 
 GLuint BaseTerrain::getShader() {
