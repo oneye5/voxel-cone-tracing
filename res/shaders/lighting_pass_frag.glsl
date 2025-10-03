@@ -37,11 +37,7 @@ float OCCLUDE_THRESHOLD_FOR_SECONDARY_CONE = uOccludeThresholdForSecondaryCone;
 float TRANSMITTANCE_NEEDED_CONE_TERMINATION = uTransmittanceNeededForConeTermination;
 vec3 AMBIENT = uAmbientColor;
 const float PI = 3.14159265359;
-vec3 cameraPos = -vec3(
-    dot(uViewMatrix[0].xyz, uViewMatrix[3].xyz),
-    dot(uViewMatrix[1].xyz, uViewMatrix[3].xyz),
-    dot(uViewMatrix[2].xyz, uViewMatrix[3].xyz)
-);
+vec3 cameraPos = vec3(inverse(uViewMatrix)[3]);
 
 vec3 worldToVoxel(vec3 pos) {
     return (pos / uVoxelWorldSize) + 0.5;
@@ -123,7 +119,7 @@ vec3 traceCone(vec3 origin, vec3 direction, float aperture) {
     float distance = VOXEL_SIZE * 2.0;
     float transmittance = 1.0;
 
-    for (int i = 0; i < MAX_STEPS; i++) {
+    for (float i = 0; i < MAX_STEPS; i++) {
         vec3 samplePos = origin + direction * distance;
         vec3 sampleCoord = worldToVoxel(samplePos);
 
@@ -153,7 +149,7 @@ vec3 traceCone(vec3 origin, vec3 direction, float aperture) {
             vec3 secondaryPos = samplePos + normal * VOXEL_SIZE * 2.0;
             float roughness = 1.0 - smoothness;
             float secondaryAperture = tan(roughness * PI * 0.5);
-            vec3 reflDir = normalize(reflect(-direction, normal));
+            vec3 reflDir = normalize(reflect(direction, normal));
             vec3 secondary = traceConeWithoutSecondary(secondaryPos, reflDir, secondaryAperture);
 
             // lambert diffuse
@@ -190,16 +186,19 @@ vec3 sampleHemisphere(vec3 origin, vec3 normal) {
     getTangentSpace(normal, tangent, bitangent);
     vec3 totalLight = vec3(0.0);
 
-    for (int i = 0; i < NUM_CONES; i++) {
-        float angle = float(i) * 2.0 * PI / float(NUM_CONES);
-        // cosine weighted sampling - more samples near normal
-        float phi = (float(i) + 0.5) / float(NUM_CONES);
-        float cosTheta = sqrt(1.0 - phi);
-        float sinTheta = sqrt(phi);
+    for (float i = 0; i < NUM_CONES; i++) {
+        float xi1 = (float(i) + 0.5) / float(NUM_CONES);
+        float xi2 = fract(sin(float(i) * 12.9898) * 43758.5453); // random-ish
+
+        float theta = acos(sqrt(1.0 - xi1));
+        float phi = 2.0 * PI * xi2;
+
+        float sinTheta = sin(theta);
+        float cosTheta = cos(theta);
 
         vec3 direction = normalize(
-            tangent * (cos(angle) * sinTheta) +
-            bitangent * (sin(angle) * sinTheta) +
+            tangent * cos(phi) * sinTheta +
+            bitangent * sin(phi) * sinTheta +
             normal * cosTheta
         );
 
@@ -246,10 +245,11 @@ void main() {
     vec3 specularLight = traceCone(traceOrigin, reflectDir, specularAperture) * BRIGHTNESS_MULTIPLIER;
 
     // combine lighting with physically based energy conservation
-    vec3 diffuse = kD * albedo * indirectDiffuse / PI;
+    vec3 diffuse = kD * albedo * indirectDiffuse;
     vec3 specular = specularLight * F;
 
     vec3 finalColor = diffuse + specular;
 
     FragColor = vec4(finalColor, 1.0);
+    //FragColor = vec4(AMBIENT, 1.0);
 }

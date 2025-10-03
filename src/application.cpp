@@ -48,11 +48,11 @@ Application::Application(GLFWwindow *window) : m_window(window) {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
-	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(2.5,5,2.5));
-	light->modelTransform = glm::scale(light->modelTransform, vec3(0.4));
+	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(2.5,7,2.5));
+	light->modelTransform = glm::scale(light->modelTransform, vec3(0.45));
 
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(3, 3, 3));
-	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.5));
+	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.4));
 
 	exampleRenderable2->mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//axis.obj")).build();
 	exampleRenderable2->modelTransform = glm::scale(glm::mat4(1), vec3(0.2,0.2,-0.2));
@@ -135,14 +135,15 @@ void Application::renderGUI() {
 	ImGui::Text("Renderer params:");
 	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
 	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
-	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.01, 20);
+	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.01, 2);
 	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 256);
 	ImGui::SliderFloat("Emissive threshold", &renderer->lightingPass->params.uEmissiveThreshold, 0, 1);
 	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
 	ImGui::SliderFloat("Occlusion threshold for secondary cone", &renderer->lightingPass->params.uOccludeThresholdForSecondaryCone, 0, 1);
 	ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
-	float x[] = { renderer->lightingPass->params.uAmbientColor.r ,renderer->lightingPass->params.uAmbientColor.g,renderer->lightingPass->params.uAmbientColor.b};
-	ImGui::SliderFloat3("Ambient RGB", x, 0, 1);
+	ImGui::SliderFloat("Ambient R", &renderer->lightingPass->params.uAmbientColor.r, 0.0, 0.1);
+	ImGui::SliderFloat("Ambient G", &renderer->lightingPass->params.uAmbientColor.g, 0.0, 0.1);
+	ImGui::SliderFloat("Ambient B", &renderer->lightingPass->params.uAmbientColor.b, 0.0, 0.1);
 	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 1000);
 	ImGui::Separator();
 	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);

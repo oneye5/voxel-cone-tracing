@@ -44,15 +44,15 @@ public:
 		glUniform1i(glGetUniformLocation(shader, "voxelTex2"), 6);
 
 		// set default params
-		params.uConeAperture = 0.3;
-		params.uStepMultiplier = 1.5;
-		params.uMaxSteps = 256;
+		params.uConeAperture = 0.8;
+		params.uStepMultiplier = 0.2;
+		params.uMaxSteps = 128;
 		params.uEmissiveThreshold = 0.0;
-		params.uNumDiffuseCones = 4;
+		params.uNumDiffuseCones = 12;
 		params.uDiffuseBrightnessMultiplier = 20.0;
 		params.uOccludeThresholdForSecondaryCone = 0.5;
-		params.uTransmittanceNeededForConeTermination = 0.1;
-		params.uAmbientColor = glm::vec3(0.03);
+		params.uTransmittanceNeededForConeTermination = 0.15;
+		params.uAmbientColor = glm::vec3(0.001);
 	}
 
 	~gBufferLightingPass() {
