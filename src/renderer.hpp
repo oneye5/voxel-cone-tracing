@@ -63,7 +63,8 @@ public:
         }
 
         prepass->executePrepass(shaders, [&]() {drawAll(); });
-        lightingPass->runPass(debug_params.gbuffer_debug_mode_on ? debug_params.debug_channel_index : 0);
+
+        lightingPass->runPass(view ,debug_params.gbuffer_debug_mode_on ? debug_params.debug_channel_index : 0);
     }
 
     void cleanDebugParams() { // make sure the params make sense, eg. only one debug mode is on

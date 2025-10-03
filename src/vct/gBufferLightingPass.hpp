@@ -14,7 +14,19 @@
 
 class gBufferLightingPass {
 public:
-	//int* debugModePtr = nullptr;
+	struct light_pass_params {
+		float uConeAperture;
+		float uStepMultiplier;
+		float uMaxSteps;
+		float uEmissiveThreshold;
+		int   uNumDiffuseCones;
+		float uDiffuseBrightnessMultiplier;
+		float uOccludeThresholdForSecondaryCone;
+		float uTransmittanceNeededForConeTermination;
+		glm::vec3  uAmbientColor;
+	};
+	light_pass_params params;
+
 	gBufferLightingPass(gBufferPrepass* prepassObj, Voxelizer* voxelizerObj) {
 		prepass = prepassObj;
 		voxelizer = voxelizerObj;
@@ -30,6 +42,17 @@ public:
 		glUniform1i(glGetUniformLocation(shader, "voxelTex0"), 4);
 		glUniform1i(glGetUniformLocation(shader, "voxelTex1"), 5);
 		glUniform1i(glGetUniformLocation(shader, "voxelTex2"), 6);
+
+		// set default params
+		params.uConeAperture = 0.3;
+		params.uStepMultiplier = 1.5;
+		params.uMaxSteps = 256;
+		params.uEmissiveThreshold = 0.0;
+		params.uNumDiffuseCones = 4;
+		params.uDiffuseBrightnessMultiplier = 20.0;
+		params.uOccludeThresholdForSecondaryCone = 0.5;
+		params.uTransmittanceNeededForConeTermination = 0.1;
+		params.uAmbientColor = glm::vec3(0.03);
 	}
 
 	~gBufferLightingPass() {
@@ -48,11 +71,23 @@ public:
 		}
 	}
 
-	void runPass(int debugMode = 0) {
+	void runPass(glm::mat4& view, int debugMode = 0) {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Render to screen
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
+
+		glUniformMatrix4fv(glGetUniformLocation(shader, "uViewMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniform1f(glGetUniformLocation(shader, "uConeAperture"), params.uConeAperture);
+		glUniform1f(glGetUniformLocation(shader, "uStepMultiplier"), params.uStepMultiplier);
+		glUniform1f(glGetUniformLocation(shader, "uMaxSteps"), params.uMaxSteps);
+		glUniform1f(glGetUniformLocation(shader, "uEmissiveThreshold"), params.uEmissiveThreshold);
+		glUniform1f(glGetUniformLocation(shader, "uDiffuseBrightnessMultiplier"), params.uDiffuseBrightnessMultiplier);
+		glUniform1f(glGetUniformLocation(shader, "uOccludeThresholdForSecondaryCone"), params.uOccludeThresholdForSecondaryCone);
+		glUniform1f(glGetUniformLocation(shader, "uTransmittanceNeededForConeTermination"), params.uTransmittanceNeededForConeTermination);
+		glUniform1i(glGetUniformLocation(shader, "uNumDiffuseCones"), params.uNumDiffuseCones);
+		glUniform3fv(glGetUniformLocation(shader, "uAmbientColor"), 1, glm::value_ptr(params.uAmbientColor));
+
 		// Bind debug mode
 		glUniform1i(glGetUniformLocation(shader, "uDebugIndex"), debugMode);
 

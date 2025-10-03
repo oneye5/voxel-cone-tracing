@@ -124,15 +124,22 @@ void Application::renderGUI() {
 	ImGui::SliderFloat("Yaw", &m_yaw, -pi<float>(), pi<float>(), "%.2f");
 	ImGui::SliderFloat("Distance", &m_distance, 0, 100, "%.2f");
 
-	// helpful drawing options
-	ImGui::Checkbox("Show axis", &m_show_axis);
-	ImGui::SameLine();
-	ImGui::Checkbox("Show grid", &m_show_grid);
-	ImGui::Checkbox("Wireframe", &m_showWireframe);
-	ImGui::SameLine();
 	if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
 
 #pragma region renderer params
+	ImGui::Separator();
+	ImGui::Text("Renderer params:");
+	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
+	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
+	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.01, 20);
+	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 256);
+	ImGui::SliderFloat("Emissive threshold", &renderer->lightingPass->params.uEmissiveThreshold, 0, 1);
+	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
+	ImGui::SliderFloat("Occlusion threshold for secondary cone", &renderer->lightingPass->params.uOccludeThresholdForSecondaryCone, 0, 1);
+	ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
+	float x[] = { renderer->lightingPass->params.uAmbientColor.r ,renderer->lightingPass->params.uAmbientColor.g,renderer->lightingPass->params.uAmbientColor.b};
+	ImGui::SliderFloat3("Ambient RGB", x, 0, 1);
+	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 1000);
 	ImGui::Separator();
 	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
 	ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
