@@ -8,10 +8,12 @@ namespace Terrain {
 	// Hydraulic particle droplet.
 	struct Particle {
 		glm::vec2 c_pos;
-		glm::vec2 c_dir;
+		glm::vec2 c_dir = glm::vec2(0.0f);
 		float c_vel;
 		float c_water;
-		float c_sediment;
+		float c_sediment = 0.0f;
+		int c_steps = 0; // How many iterations has this cell had
+		bool valid = true; // Whether the particle is valid (still has lifetime, on the terrain etc)
 	};
 
 	struct ErosionSettings {
@@ -27,11 +29,13 @@ namespace Terrain {
 		float start_velocity = 1.0f;        // Initial droplet speed
 		float start_water = 1.0f;        // Initial droplet water volume
 		int erosion_radius = 3;          // Radius of erosion brush
+
+		int steps_per_frame = 10; // How many steps should a particle travel for each frame (when viewing in real time)
 	};
 
 	class HydraulicErosion {
 	public:
-		std::vector<Particle> particles; // Particles currently being simulated.
+		Particle c_particle; // current particle being simulated
 		int width, height; // The width and height of the heightmap
 		std::vector<float> heightmap; // float based heightmap
 		ErosionSettings settings;
@@ -47,9 +51,13 @@ namespace Terrain {
 		// Get the eroded heightmap but with values mapped to uint16
 		std::vector<uint16_t> getHeightmapAsUint16() const;
 
+		// Run the erosion simulation without viewing progress (so run whole simulation as batch)
 		void simulate(int iterations = -1);
 
-		void newSimulation();
+		// Start a new erosion simulation for real time viewing
+		void newSimulation(const std::vector<float>& init_heights, int w, int h);
+		void stepSimulation();
+		int iterations_ran = 0; // Amount of iterations executed, for real-time
 
 		const std::vector<float>& getHeightmap() const {
 			return heightmap;
@@ -68,6 +76,16 @@ namespace Terrain {
 		glm::vec2 calculateBilinearGradient(glm::vec2 pos) const;
 		void applyErosion(glm::vec2 pos, float amount, int radius);
 		void applyDeposition(glm::vec2 pos, float amount);
-		void simulateDroplet();
+
+		// Simulate current droplet for number of steps specified (default max_lifetime for batch and steps_per_frame for real-time)
+		void simulateDroplet(int steps);
+
+		Particle createParticle() {
+			float x = uniform_dist(rng) * static_cast<float>(width - 1);
+			float y = uniform_dist(rng) * static_cast<float>(height - 1);
+			glm::vec2 pos(x, y);
+
+			return Particle{.c_pos = pos, .c_vel = settings.start_velocity, .c_water = settings.start_water};
+		}
 	};
 }

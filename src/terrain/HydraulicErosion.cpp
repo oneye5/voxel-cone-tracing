@@ -155,21 +155,10 @@ void HydraulicErosion::applyDeposition(glm::vec2 pos, float amount) {
 	setHeight(x1, y1, getHeight(x1, y1) + w11 * amount);
 }
 
-void HydraulicErosion::simulateDroplet() {
-	// Start at random position
-	float x = uniform_dist(rng) * static_cast<float>(width - 1);
-	float y = uniform_dist(rng) * static_cast<float>(height - 1);
-	glm::vec2 pos(x, y);
-	
-	glm::vec2 dir(0.0f, 0.0f);
-	
-	float vel = settings.start_velocity;
-	float water = settings.start_water;
-	float sediment = 0;
-
-	for (int lifetime = 0; lifetime < settings.max_lifetime; lifetime++) {
-		glm::vec2 pos_old = pos;
-		glm::vec2 dir_old = dir;
+void HydraulicErosion::simulateDroplet(int steps) {
+	for (int lifetime = 0; lifetime < steps && c_particle.valid; lifetime++) {
+		glm::vec2 pos_old = c_particle.c_pos;
+		glm::vec2 dir_old = c_particle.c_dir;
 		
 		glm::vec2 gradient = calculateBilinearGradient(pos_old);
 		glm::vec2 dir_new = dir_old * settings.inertia - gradient * (1.0f - settings.inertia);
@@ -185,12 +174,13 @@ void HydraulicErosion::simulateDroplet() {
 			dir_new = glm::normalize(dir_new);
 			// dir_new = glm::vec2(dir_new.x / dir_length, dir_new.y / dir_length); // might as well reuse the length
 		}
-		dir = dir_new;
+		c_particle.c_dir = dir_new;
 		glm::vec2 pos_new = pos_old + dir_new;
-		pos = pos_new;
+		c_particle.c_pos = pos_new;
 
 		if (pos_new.x < 0 || pos_new.x >= width-1 || pos_new.y < 0 || pos_new.y >= height-1) {
 			// Stop if out of bounds
+			c_particle.valid = false;
 			break;
 		}
 
@@ -199,26 +189,36 @@ void HydraulicErosion::simulateDroplet() {
 		const float h_new = getBilinearHeight(pos_new);
 		const float h_dif = h_new - h_old;
 
-		float capacity = std::max(-h_dif, settings.min_slope) * vel * water * settings.capacity_s;
-		if (sediment > capacity || h_dif > 0.0) {
+		float capacity = std::max(-h_dif, settings.min_slope) * c_particle.c_vel * c_particle.c_water * settings.capacity_s;
+		if (c_particle.c_sediment > capacity || h_dif > 0.0) {
 			// Deposit if carrying too much or going uphill
-			const float amount_to_deposit = (h_dif > 0.0) ? std::min(h_dif, sediment) : (sediment - capacity) * settings.deposition;
-			sediment -= amount_to_deposit;
+			const float amount_to_deposit = (h_dif > 0.0) ? std::min(h_dif, c_particle.c_sediment) : (c_particle.c_sediment - capacity) * settings.deposition;
+			c_particle.c_sediment -= amount_to_deposit;
 			
 			applyDeposition(pos_old, amount_to_deposit);
 			
 		} else { // Steal some sediment from position and add it to particle sediment
-			const float amount_to_erode = std::min((capacity - sediment) * settings.erode_speed, -h_dif);
+			const float amount_to_erode = std::min((capacity - c_particle.c_sediment) * settings.erode_speed, -h_dif);
 			applyErosion(pos_old, amount_to_erode, settings.erosion_radius);
-			sediment += amount_to_erode;
+			c_particle.c_sediment += amount_to_erode;
 		}
 
 		// Update the speed and evaporate water
-		vel = sqrtf(std::max(((vel * vel) + h_dif * settings.gravity), 0.0f));
-		water = water * (1.0f - settings.evaporate_speed);
+		c_particle.c_vel = sqrtf(std::max(((c_particle.c_vel * c_particle.c_vel) + h_dif * settings.gravity), 0.0f));
+		c_particle.c_water = c_particle.c_water * (1.0f - settings.evaporate_speed);
 
 		// Stop if no water left
-		if (water < 0.01f) {break;}
+		if (c_particle.c_water < 0.01f) {
+			c_particle.valid = false;
+			break;
+		}
+
+		c_particle.c_steps += 1;
+		if (c_particle.c_steps >= settings.max_lifetime) {
+			// TODO - could give cells their own lifetime idk
+			c_particle.valid = false;
+			break;
+		}
 	}
 }
 
@@ -227,13 +227,36 @@ void HydraulicErosion::simulate(int iterations) {
 	// rng = std::mt19937(1337); // DEBUG - for if i want the same rng
 
 	for (int i = 0; i < iterations; i++) {
-		simulateDroplet();
+		c_particle = createParticle();
+		simulateDroplet(settings.max_lifetime);
 
 		// Optional: progress feedback every 1000 iterations
 		if (i % 1000 == 0 && i > 0) {
-			// You could add a progress callback here if needed
+			// TODO - add some callback or smth later (but probs not lmao)
 		}
 	}
+}
+
+void HydraulicErosion::newSimulation(const std::vector<float> &init_heights, int w, int h) {
+	heightmap = init_heights;
+	width = w;
+	height = h;
+
+	c_particle = createParticle();
+	iterations_ran = 0;
+}
+
+void HydraulicErosion::stepSimulation() {
+	if (iterations_ran > settings.iterations) {
+		// TODO - set some values as invalid here or smth
+		return;
+	}
+	if (!c_particle.valid) { // Particle is invalid, create a new one
+		c_particle = createParticle();
+	}
+
+	simulateDroplet(settings.steps_per_frame);
+	iterations_ran += 1;
 }
 
 
@@ -280,3 +303,5 @@ void HydraulicErosion::setSimulationDims(int w, int h) {
 	width = w;
 	height = h;
 }
+
+

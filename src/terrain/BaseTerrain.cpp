@@ -21,7 +21,7 @@ GLuint Textures::snow = 0;
 
 static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub);
 
-BaseTerrain::BaseTerrain() {
+BaseTerrain::BaseTerrain() : t_erosion(t_noise.width, t_noise.height) {
 	t_mesh = CreateBasicPlane(512, 512);
 	cgra::shader_builder sb;
 	sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//terrain//basic_terrain.vs"));

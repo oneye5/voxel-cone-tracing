@@ -38,6 +38,9 @@ namespace Terrain {
 		PlaneTerrain t_mesh; // The plane mesh to use
 		int plane_subs = 512;
 		TerrainSettings t_settings;
+
+		HydraulicErosion t_erosion;
+
 		bool useTexturing = true;
 		GLuint texture1; // The first texture, bottom most (default water)
 		GLuint texture2; // The second texture (default sand)
