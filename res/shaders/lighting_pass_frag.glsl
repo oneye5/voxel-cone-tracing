@@ -12,6 +12,7 @@ uniform sampler3D voxelTex2; // Albedo.rgb + EmissiveFactor
 uniform int uDebugIndex;
 uniform int uVoxelRes;
 uniform float uVoxelWorldSize;
+uniform vec3 uVoxelCenter;
 uniform mat4 uViewMatrix; 
 
 // tweakable settings
@@ -31,7 +32,7 @@ const float PI = 3.14159265359;
 vec3 cameraPos = vec3(inverse(uViewMatrix)[3]);
 
 vec3 worldToVoxel(vec3 pos) {
-    return (pos / uVoxelWorldSize) + 0.5;
+    return (pos - uVoxelCenter + uVoxelWorldSize * 0.5) / uVoxelWorldSize;
 }
 
 float calculateOcclusion(vec3 normal) {

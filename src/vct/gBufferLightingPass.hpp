@@ -87,6 +87,8 @@ public:
 		glUniform1f(glGetUniformLocation(shader, "uTransmittanceNeededForConeTermination"), params.uTransmittanceNeededForConeTermination);
 		glUniform1i(glGetUniformLocation(shader, "uNumDiffuseCones"), params.uNumDiffuseCones);
 		glUniform3fv(glGetUniformLocation(shader, "uAmbientColor"), 1, glm::value_ptr(params.uAmbientColor));
+		glUniform3fv(glGetUniformLocation(shader, "uVoxelCenter"), 1, value_ptr(voxelizer->m_params.center));
+
 
 		// Bind debug mode
 		glUniform1i(glGetUniformLocation(shader, "uDebugIndex"), debugMode);

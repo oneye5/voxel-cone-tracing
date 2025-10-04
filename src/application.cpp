@@ -47,11 +47,11 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
-	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(2.5, 7, 2.5));
+	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0, 5, 0));
 	light->modelTransform = glm::scale(light->modelTransform, vec3(0.45));
 
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(3, 3, 3));
-	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.4));
+	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.2));
 
 	exampleRenderable2->mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//axis.obj")).build();
 	exampleRenderable2->modelTransform = glm::scale(glm::mat4(1), vec3(0.2, 0.2, -0.2));
@@ -64,7 +64,7 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 
 	// renderer tweaks based on scene size
 	renderer->voxelizer->setCenter(glm::vec3(2.5, 5, 2.5));
-	renderer->voxelizer->setWorldSize(45);
+	renderer->voxelizer->setWorldSize(26);
 
 }
 

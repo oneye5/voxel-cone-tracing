@@ -6,6 +6,9 @@
 using namespace glm;
 using namespace cgra;
 
+#define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
+#define VOXELIZE_RES 512
+
 Voxelizer::Voxelizer(int resolution)
     : m_params{ resolution, 30.0f, vec3(0.0f) }
     , m_voxelTex0(0)
@@ -135,7 +138,7 @@ void Voxelizer::voxelize(std::function<void()> drawMainGeometry, std::vector<glm
         std::cerr << "Voxelizer not properly initialized!" << std::endl;
         return;
     }
-
+    //glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
     clearVoxelTexture();
 
     // Store current viewport
@@ -174,8 +177,9 @@ void Voxelizer::clearVoxelTexture() {
 }
 
 void Voxelizer::setupVoxelizationState() {
-   
-    glViewport(0, 0, m_params.resolution, m_params.resolution);
+
+    // Use higher resolution viewport for better fragment coverage
+    glViewport(0, 0, VOXELIZE_RES, VOXELIZE_RES);
 
     // Bind voxel texture for writing
     glBindImageTexture(0, m_voxelTex0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
@@ -193,44 +197,61 @@ void Voxelizer::restoreRenderingState(int width, int height) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, width, height);
+   // glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
+
 }
 
-void Voxelizer::performVoxelization(std::function<void()> drawMainGeometry, std::vector<glm::mat4> modelTransforms, std::vector<GLuint> usingShaders) {
-    // Set common uniforms
+void Voxelizer::performVoxelization(std::function<void()> drawMainGeometry,
+    std::vector<glm::mat4> modelTransforms,
+    std::vector<GLuint> usingShaders) {
     mat4 orthoProj = createOrthographicProjection();
     auto views = createOrthographicViews();
 
-    for (int i = 0; i < usingShaders.size(); i++) { // set uniforms for all shaders
-        auto shader = usingShaders[i];
-        auto modelTransform = modelTransforms[i];
+    // Multiple passes with sub-pixel jitter
+    const int numSamples = 4;
+    const float jitterAmount = 0.5f / float(m_params.resolution);
 
-        glUseProgram(shader);
-        glUniformMatrix4fv(glGetUniformLocation(shader, "uModelMatrix"), 1, GL_FALSE, value_ptr(modelTransform));
-        glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, GL_FALSE, value_ptr(orthoProj));
-        glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), m_params.resolution);
-        glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), m_params.worldSize);
-        glUniform1i(glGetUniformLocation(shader, "uRenderMode"), 0); // voxelize mode
-    }
+    for (int sample = 0; sample < numSamples; sample++) {
+        // Calculate jitter offset
+        float jitterX = ((sample % 2) - 0.5f) * jitterAmount;
+        float jitterY = ((sample / 2) - 0.5f) * jitterAmount;
+        mat4 jitterProj = translate(mat4(1.0f), vec3(jitterX, jitterY, 0.0f)) * orthoProj;
 
-    // Render from three orthogonal directions
-    for (int i = 0; i < 3; ++i) {
-        for (int ii = 0; ii < usingShaders.size(); ii++) { // set uniforms for all shaders
-            auto shader = usingShaders[ii];
-            auto modelTransform = modelTransforms[ii];
-            glm::mat4 modelView = views[i] * modelTransform;
+        for (int i = 0; i < usingShaders.size(); i++) {
+            auto shader = usingShaders[i];
+            auto modelTransform = modelTransforms[i];
 
             glUseProgram(shader);
-            glUniformMatrix4fv(glGetUniformLocation(shader, "uModelViewMatrix"), 1, GL_FALSE, value_ptr(views[i]));
-            glUniformMatrix4fv(glGetUniformLocation(shader, "uViewMatrix"), 1, GL_FALSE, value_ptr(modelView));
+            glUniform3fv(glGetUniformLocation(shader, "uVoxelCenter"), 1, value_ptr(m_params.center));
+            glUniformMatrix4fv(glGetUniformLocation(shader, "uModelMatrix"), 1, GL_FALSE, value_ptr(modelTransform));
+            glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, GL_FALSE, value_ptr(jitterProj));
+            glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), m_params.resolution);
+            glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), m_params.worldSize);
+            glUniform1i(glGetUniformLocation(shader, "uRenderMode"), 0);
         }
-      
-        drawMainGeometry();
+
+        for (int i = 0; i < 3; ++i) {
+            for (int ii = 0; ii < usingShaders.size(); ii++) {
+                auto shader = usingShaders[ii];
+                auto modelTransform = modelTransforms[ii];
+                glm::mat4 modelView = views[i] * modelTransform;
+
+                glUseProgram(shader);
+                glUniformMatrix4fv(glGetUniformLocation(shader, "uModelViewMatrix"), 1, GL_FALSE, value_ptr(views[i]));
+                glUniformMatrix4fv(glGetUniformLocation(shader, "uViewMatrix"), 1, GL_FALSE, value_ptr(modelView));
+            }
+
+            drawMainGeometry();
+        }
     }
 }
 
 mat4 Voxelizer::createOrthographicProjection() const {
     float halfSize = m_params.worldSize / 2.0f;
-    return ortho(-halfSize, halfSize, -halfSize, halfSize, -halfSize, halfSize);
+    float margin = 0.01f * m_params.worldSize; // 1% extra
+    return ortho(-halfSize - margin, halfSize + margin,
+        -halfSize - margin, halfSize + margin,
+        -halfSize * 2.0f, halfSize * 2.0f);
 }
 
 std::array<mat4, 3> Voxelizer::createOrthographicViews() const {

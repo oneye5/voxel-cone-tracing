@@ -111,6 +111,17 @@ int main() {
 	Application application(window);
 	application_ptr = &application;
 
+
+	// Or query all extensions
+	GLint numExtensions;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+	for (GLint i = 0; i < numExtensions; i++) {
+		const GLubyte* extension = glGetStringi(GL_EXTENSIONS, i);
+		printf("%s\n", extension);
+		// Look for GL_NV_conservative_raster or GL_INTEL_conservative_rasterization
+	}
+
+
 	// loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 
