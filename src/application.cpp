@@ -50,8 +50,8 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
-	lightPos = glm::vec3(- 2.5, 5, 2.5);
-	lightScale = 0.3;
+	lightPos = glm::vec3(-3.5, 10, -5.5);
+	lightScale = 1.0;
 	light->modelTransform = glm::translate(glm::mat4(1), lightPos); 
 	light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0.5, 4, 0.5));
@@ -65,7 +65,7 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	// renderer->addRenderable(t_water);
 	renderer->addRenderable(light);
 	renderer->addRenderable(exampleRenderable);
-	renderer->addRenderable(exampleRenderable2);
+	//renderer->addRenderable(exampleRenderable2);
 
 	// renderer tweaks based on scene size
 	renderer->voxelizer->setCenter(glm::vec3(-5, 5, -5));
