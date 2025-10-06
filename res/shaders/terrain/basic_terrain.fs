@@ -51,7 +51,7 @@ uniform bool useFakedLighting; // whether to use faked lighting, just until prop
 uniform float min_rock_slope;
 uniform float max_grass_slope;
 
-const float TEX_BASE_SCALAR = 4.0f;
+const float TEX_BASE_SCALAR = 8.0f;
 
 void writeRenderInfo(MaterialData m) {
     if (uRenderMode == 0) { // voxel
@@ -178,7 +178,7 @@ void main() {
 	m.alb = col;
 	m.emi = vec3(0.0);
 	m.mtl = 0.0; // TODO - tweak these later, probs based on texture
-	m.smoothness = 0.95;
+	m.smoothness = 0.1;
 	m.emiFac = 0.0;
 
 	writeRenderInfo(m);

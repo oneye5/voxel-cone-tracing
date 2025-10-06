@@ -29,7 +29,7 @@ BaseTerrain::BaseTerrain() : t_erosion(t_noise.width, t_noise.height) {
 	shader = sb.build();
 
 	t_mesh.init_transform = glm::translate(glm::mat4(1), glm::vec3(-5,0,-5));
-	t_mesh.init_transform = glm::scale(t_mesh.init_transform, glm::vec3(DEFAULT_TERRAIN_SCALE));
+	t_mesh.init_transform = glm::scale(t_mesh.init_transform, glm::vec3(DEFAULT_TERRAIN_SCALE, DEFAULT_TERRAIN_SCALE / 2, DEFAULT_TERRAIN_SCALE));
 	loadTextures();
 
 	// Set up the texture uniforms cuz only need to do once
