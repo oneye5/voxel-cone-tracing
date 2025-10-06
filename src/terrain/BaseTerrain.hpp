@@ -13,6 +13,9 @@ namespace Terrain {
 		float min_height = 0.0; // Min height of the terrain
 		float amplitude = 1.0f; // Amplitude of the height generation
 		float sea_level = 1.0f; // The y level to draw the water plane at
+
+		float min_rock_slope = 0.85f; // The min slope for rock texturing (0-1)
+		float max_grass_slope = 0.9f; // The max slope for grass texturing (0-1)
 	};
 
 	struct PlaneTerrain {

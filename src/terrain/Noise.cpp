@@ -283,7 +283,7 @@ void Noise::changeTextureSize(int w, int h) {
 	createTexture();
 
 	// TODO - implement this later, needs to update the stuff in base terrain
-	throw std::runtime_error("Implement this again later");
+	//throw std::runtime_error("Implement this again later");
 }
 
 // Allocates a texture for the noise to use and sets texid to it

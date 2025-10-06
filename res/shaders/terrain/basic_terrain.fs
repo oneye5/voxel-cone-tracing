@@ -46,7 +46,11 @@ uniform sampler2D snow_texture;
 uniform bool useTexturing; // whether or not to use texturing or just display the heightmap
 uniform bool useFakedLighting; // whether to use faked lighting, just until proper lighting is implemented
 
-const float TEX_BASE_SCALAR = 8.0f;
+// Slope texturing parameters
+uniform float min_rock_slope;
+uniform float max_grass_slope;
+
+const float TEX_BASE_SCALAR = 4.0f;
 
 void writeRenderInfo(MaterialData m) {
     if (uRenderMode == 0) { // voxel
@@ -91,7 +95,7 @@ vec3 getTerrainColor(vec2 uv, float height) {
 	const float rock_level = 0.65;
 
 	// Define blend ranges for smooth transitions
-	const float blend_range = 0.1;
+	const float blend_range = 0.25;
 
 	// Sample all textures
 	vec3 water_color = texture(water_texture, uv).rgb;
@@ -126,13 +130,29 @@ vec3 getTerrainColor(vec2 uv, float height) {
 	return final_color;
 }
 
+vec3 getTerrainColorSlope(vec2 uv, vec3 normal) {
+	vec3 grass_col = texture(grass_texture, uv).rgb;
+	vec3 rock_col = texture(rock_texture, uv).rgb;
+
+	float rock_grass_weight = normal.y;
+	
+	rock_grass_weight = max(min_rock_slope, rock_grass_weight);
+	rock_grass_weight = min(max_grass_slope, rock_grass_weight);
+	rock_grass_weight -= min_rock_slope;
+	rock_grass_weight /= max_grass_slope - min_rock_slope; // TODO - potential divide by zero
+
+	vec3 col = mix(rock_col, grass_col, rock_grass_weight);
+	return col;
+}
+
 void main() {
 	MaterialData m;
 	float height = texture(heightMap, f_in.textureCoord).r;
 	vec3 col;
 	if (useTexturing) {
 		//col = texture(sand_texture, f_in.textureCoord * TEX_BASE_SCALAR).rgb;
-		col = getTerrainColor(f_in.textureCoord * TEX_BASE_SCALAR, height).xyz;
+		// col = getTerrainColor(f_in.textureCoord * TEX_BASE_SCALAR, height).xyz;
+		col = getTerrainColorSlope(f_in.textureCoord * TEX_BASE_SCALAR, f_in.normal);
 	} else {
 		col = vec3(height, height, height);
 	}
@@ -160,8 +180,8 @@ void main() {
 	m.nrm = f_in.normal;
 	m.alb = col;
 	m.emi = vec3(0.0);
-	m.mtl = 0.2; // TODO - tweak these later, probs based on texture
-	m.smoothness = 0.8;
+	m.mtl = 0.0; // TODO - tweak these later, probs based on texture
+	m.smoothness = 0.95;
 	m.emiFac = 0.0;
 
 	writeRenderInfo(m);

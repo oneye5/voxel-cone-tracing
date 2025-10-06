@@ -91,15 +91,15 @@ namespace cgra {
 	};
 
 	// Create and return a mesh builder containing a plane from 0,0,0 to 1,0,1 subdivided by the amount specified
-	static mesh_builder CREATE_PLANE(int x_sub, int z_sub) {
+	static mesh_builder CREATE_PLANE(int x_sub, int z_sub, float size = 2.0f) {
 		mesh_builder mb;
 
-		const float x_step = 1.0f / static_cast<float>(x_sub);
-		const float z_step = 1.0f / static_cast<float>(z_sub);
+		const float x_step = size / static_cast<float>(x_sub);
+		const float z_step = size / static_cast<float>(z_sub);
 
-		for (float x = 0.0; x <= 1.0; x += x_step) {
-			for (float z = 0.0; z <= 1.0; z += z_step) {
-				mb.push_vertex({{x, 0.0, z}, {0.0, 1.0, 0.0}, {x, z}});
+		for (float x = 0.0; x <= size; x += x_step) {
+			for (float z = 0.0; z <= size; z += z_step) {
+				mb.push_vertex({{x, 0.0, z}, {0.0, 1.0, 0.0}, {x/size, z/size}});
 			}
 		}
 

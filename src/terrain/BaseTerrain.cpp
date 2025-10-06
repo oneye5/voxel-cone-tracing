@@ -65,6 +65,9 @@ void BaseTerrain::draw() {
 	glUniform1i(glGetUniformLocation(shader, "useFakedLighting"), useFakedLighting);
 	glUniform1i(glGetUniformLocation(shader, "subdivisions"), plane_subs);
 	glUniform1f(glGetUniformLocation(shader, "amplitude"), t_settings.amplitude);
+
+	glUniform1f(glGetUniformLocation(shader, "min_rock_slope"), t_settings.min_rock_slope);
+	glUniform1f(glGetUniformLocation(shader, "max_grass_slope"), t_settings.max_grass_slope);
 	
 	glActiveTexture(GL_TEXTURE0);
 	// glUniform1i(glGetUniformLocation(shader, "heightMap"), 0);
@@ -125,12 +128,15 @@ void BaseTerrain::renderUI() {
 		water_plane->update_transform(vec3(DEFAULT_TERRAIN_SCALE), t_settings.sea_level);
 	}
 
+	ImGui::Text("Texturing settings");
+	ImGui::SliderFloat("Min Rock Slope", &t_settings.min_rock_slope, 0.0f, t_settings.max_grass_slope-0.001f);
+	ImGui::SliderFloat("Max Grass Slope", &t_settings.max_grass_slope, 0.0f, 1.0f);
+
 	t_noise.makeEditUI();
 
 	ImGui::Separator();
 
 	// Erosion controls
-	ImGui::Text("Terrain Settings");
 	t_erosion.renderUI();
 
 	if (ImGui::Button("Apply Erosion")) { // stackable
@@ -162,7 +168,7 @@ void BaseTerrain::renderUI() {
 void BaseTerrain::loadTextures() {
 	static const std::string WATER_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//tex_Water.jpg");
 	static const std::string SAND_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//sand_2.png");
-	static const std::string GRASS_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//grass_2.jpg");
+	static const std::string GRASS_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//grass_3.png");
 	static const std::string ROCK_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//rock.jpg");
 	static const std::string SNOW_PATH = CGRA_SRCDIR + std::string("//res//textures//terrain//snow.jpg");
 
