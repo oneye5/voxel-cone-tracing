@@ -8,6 +8,7 @@ using namespace cgra;
 
 #define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
 #define VOXELIZE_RES 512
+#define VOXEL_IMAGE_TYPE GL_RGBA16F
 
 Voxelizer::Voxelizer(int resolution)
     : m_params{ resolution, 30.0f, vec3(0.0f) }
@@ -67,9 +68,10 @@ void Voxelizer::initializeTextures() {
         glGenTextures(1, &tex);
         glBindTexture(GL_TEXTURE_3D, tex);
         int mipLevels = static_cast<int>(std::floor(std::log2(m_params.resolution))) + 1;
+        m_params.mipLevels = mipLevels;
 
         // allocate immutable storage for all mip levels
-        glTexStorage3D(GL_TEXTURE_3D, mipLevels, GL_RGBA16F,
+        glTexStorage3D(GL_TEXTURE_3D, mipLevels, VOXEL_IMAGE_TYPE,
             m_params.resolution,
             m_params.resolution,
             m_params.resolution);
@@ -182,9 +184,9 @@ void Voxelizer::setupVoxelizationState() {
     glViewport(0, 0, VOXELIZE_RES, VOXELIZE_RES);
 
     // Bind voxel texture for writing
-    glBindImageTexture(0, m_voxelTex0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-    glBindImageTexture(1, m_voxelTex1, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-    glBindImageTexture(2, m_voxelTex2, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+    glBindImageTexture(0, m_voxelTex0, 0, GL_TRUE, 0, GL_WRITE_ONLY, VOXEL_IMAGE_TYPE);
+    glBindImageTexture(1, m_voxelTex1, 0, GL_TRUE, 0, GL_WRITE_ONLY, VOXEL_IMAGE_TYPE);
+    glBindImageTexture(2, m_voxelTex2, 0, GL_TRUE, 0, GL_WRITE_ONLY, VOXEL_IMAGE_TYPE);
 
     // Disable framebuffer rendering since we're writing directly to 3D texture
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);

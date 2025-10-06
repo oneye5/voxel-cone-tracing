@@ -47,25 +47,26 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
-	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0, 5, 0));
-	light->modelTransform = glm::scale(light->modelTransform, vec3(0.45));
+	light->modelTransform = glm::translate(glm::mat4(1), glm::vec3(-2.5, 5, 2.5));
+	light->modelTransform = glm::scale(light->modelTransform, vec3(0.3));
 
-	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(3, 3, 3));
-	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.2));
+	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0.5, 4, 0.5));
+	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.3));
 
 	exampleRenderable2->mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//axis.obj")).build();
-	exampleRenderable2->modelTransform = glm::scale(glm::mat4(1), vec3(0.2, 0.2, -0.2));
+	exampleRenderable2->modelTransform = glm::translate(glm::mat4(1), glm::vec3(-2.5, 0, -2.5));
+	exampleRenderable2->modelTransform = glm::scale(exampleRenderable2->modelTransform, vec3(0.2, 0.2, -0.2));
+
 	// add renderables
 	renderer->addRenderable(t_terrain);
 	// renderer->addRenderable(t_water);
 	renderer->addRenderable(light);
 	renderer->addRenderable(exampleRenderable);
-	renderer->addRenderable(exampleRenderable2);
+	//renderer->addRenderable(exampleRenderable2);
 
 	// renderer tweaks based on scene size
-	renderer->voxelizer->setCenter(glm::vec3(2.5, 5, 2.5));
-	renderer->voxelizer->setWorldSize(26);
-
+	renderer->voxelizer->setCenter(glm::vec3(-2.5, 5, -2.5));
+	renderer->voxelizer->setWorldSize(25);
 }
 
 bool dirtyVoxels = true;
@@ -168,15 +169,16 @@ void Application::renderGUI() {
 	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
 	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
 	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.01, 2);
-	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 256);
+	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 1024);
 	ImGui::SliderFloat("Emissive threshold", &renderer->lightingPass->params.uEmissiveThreshold, 0, 1);
 	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
-	ImGui::SliderFloat("Occlusion threshold for secondary cone", &renderer->lightingPass->params.uOccludeThresholdForSecondaryCone, 0, 1);
 	ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
-	ImGui::SliderFloat("Ambient R", &renderer->lightingPass->params.uAmbientColor.r, 0.0, 0.1);
-	ImGui::SliderFloat("Ambient G", &renderer->lightingPass->params.uAmbientColor.g, 0.0, 0.1);
-	ImGui::SliderFloat("Ambient B", &renderer->lightingPass->params.uAmbientColor.b, 0.0, 0.1);
-	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 1000);
+	ImGui::SliderFloat("Ambient R", &renderer->lightingPass->params.uAmbientColor.r, 0.0, 0.5);
+	ImGui::SliderFloat("Ambient G", &renderer->lightingPass->params.uAmbientColor.g, 0.0, 0.5);
+	ImGui::SliderFloat("Ambient B", &renderer->lightingPass->params.uAmbientColor.b, 0.0, 0.5);
+	ImGui::SliderFloat("Reflection blend lower bound", &renderer->lightingPass->params.uReflectionBlendLowerBound, 0, 1);
+	ImGui::SliderFloat("Reflection blend upper bound", &renderer->lightingPass->params.uReflectionBlendUpperBound, 0, 1);
+
 	ImGui::Separator();
 	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
 	ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
@@ -202,7 +204,6 @@ void Application::renderGUI() {
 	if (ImGui::Button("Gbuffer show emissive colorf as RGB")) { renderer->debug_params.debug_channel_index = 7; }
 	if (ImGui::Button("Gbuffer show 'spare channel' as RGB")) { renderer->debug_params.debug_channel_index = 8; }
 	if (ImGui::Button("Gbuffer show voxel sampled position as RGB")) { renderer->debug_params.debug_channel_index = 9; }
-	if (ImGui::Button("Gbuffer show voxel sampled occlusion as RGB")) { renderer->debug_params.debug_channel_index = 10; }
 #pragma endregion
 
 	ImGui::End();

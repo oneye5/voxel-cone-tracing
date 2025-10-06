@@ -7,6 +7,7 @@ layout(binding = 2, rgba16f) uniform image3D voxelTex2; // Albedo.rgb + Emissive
 uniform int   uVoxelRes;
 uniform float uVoxelWorldSize;
 uniform int   uRenderMode; // 0 = voxelize, 1 = gbuffer
+uniform vec3 uVoxelCenter;
 
 layout(location = 0) out vec4 gPosition; // world position.xyz + metallic
 layout(location = 1) out vec4 gNormal;   // world normal.xyz + smoothness
@@ -28,40 +29,35 @@ in VertexData {
 
 uniform sampler2D water_texture;
 const float TEXTURE_SCALAR = 5.0f; // Don't just want the single texture for entire thing so repreat
-
 void writeRenderInfo(MaterialData m) {
-	if (uRenderMode == 0) { // voxel
-		vec3 vpos = (m.pos + uVoxelWorldSize * 0.5) / uVoxelWorldSize;
-		if (any(lessThan(vpos, vec3(0))) || any(greaterThan(vpos, vec3(1)))) return;
+    if (uRenderMode == 0) { // voxel
+        // center the voxel grid around uVoxelCenter
+        vec3 vpos = (m.pos - uVoxelCenter + uVoxelWorldSize * 0.5) / uVoxelWorldSize;
 
-		ivec3 texCoord = ivec3(vpos * float(uVoxelRes - 1));
+        if (any(lessThan(vpos, vec3(0))) || any(greaterThan(vpos, vec3(1)))) return;
+        ivec3 texCoord = ivec3(vpos * float(uVoxelRes - 1));
 
-		// splat radius in voxels
-		int splatRadius = 1;
+        int splatRadius = 1;
+        for (int x = -splatRadius; x <= splatRadius; ++x) {
+            for (int y = -splatRadius; y <= splatRadius; ++y) {
+                for (int z = -splatRadius; z <= splatRadius; ++z) {
+                    ivec3 tc = texCoord + ivec3(x, y, z);
+                    if (any(lessThan(tc, ivec3(0))) || any(greaterThanEqual(tc, ivec3(uVoxelRes))))
+                        continue;
 
-		for (int x = -splatRadius; x <= splatRadius; ++x) {
-			for (int y = -splatRadius; y <= splatRadius; ++y) {
-				for (int z = -splatRadius; z <= splatRadius; ++z) {
-					ivec3 tc = texCoord + ivec3(x, y, z);
-
-					// clamp to texture bounds
-					if (any(lessThan(tc, ivec3(0))) || any(greaterThanEqual(tc, ivec3(uVoxelRes))))
-						continue;
-
-					// write to voxel textures
-					imageStore(voxelTex0, tc, vec4(vpos, m.mtl));
-					imageStore(voxelTex1, tc, vec4(normalize(m.nrm), m.smoothness));
-					imageStore(voxelTex2, tc, vec4(m.alb, m.emiFac));
-				}
-			}
-		}
-	}
-	else { // gbuffer
-		gPosition = vec4(m.pos, m.mtl);
-		gNormal = vec4(normalize(m.nrm), m.smoothness);
-		gAlbedo = vec4(m.alb, m.emiFac);
-		gEmissive = vec4(m.emi * m.emiFac, 0); //
-	}
+                    imageStore(voxelTex0, tc, vec4(vpos, m.mtl));
+                    imageStore(voxelTex1, tc, vec4(normalize(m.nrm), m.smoothness));
+                    imageStore(voxelTex2, tc, vec4(m.alb, m.emiFac));
+                }
+            }
+        }
+    }
+    else { // gbuffer
+        gPosition = vec4(m.pos, m.mtl);
+        gNormal = vec4(normalize(m.nrm), m.smoothness);
+        gAlbedo = vec4(m.alb, m.emiFac);
+        gEmissive = vec4(m.emi * m.emiFac, 0);
+    }
 }
 void main() {
 	MaterialData m;

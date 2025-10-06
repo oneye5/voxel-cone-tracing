@@ -16,11 +16,11 @@ public:
         shader = sb.build();
 
         // Load mesh
-        mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//ball1.obj")).build();
+        mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//ball2.obj")).build();
 
         // Default transform & color
         modelTransform = glm::mat4(1.0f);
-        lightColor = glm::vec3(1,0.95,0.93);
+        lightColor = glm::vec3(1,0.85,0.8);
     }
 
     GLuint getShader() override { return shader; }
@@ -47,7 +47,7 @@ public:
     }
 
     glm::mat4 modelTransform;
-    glm::vec3 lightColor = glm::vec3(1.0, 0.9, 0.88);
+    glm::vec3 lightColor = glm::vec3(1, 1, 1);
     float brightness = 1;
     GLuint shader;
     cgra::gl_mesh mesh;

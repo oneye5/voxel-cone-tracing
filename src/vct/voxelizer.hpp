@@ -13,6 +13,7 @@ public:
         int resolution = 512;
         float worldSize = 30.0f;
         glm::vec3 center = glm::vec3(0.0f);
+        int mipLevels = 0;
     };
 
     Voxelizer(int resolution = 512);
