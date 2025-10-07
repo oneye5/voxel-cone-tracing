@@ -17,7 +17,7 @@ namespace Terrain {
 	};
 
 	struct ErosionSettings {
-		int iterations = 100000;        // Number of droplet simulations
+		int iterations = 300000;        // Number of droplet simulations
 		int max_lifetime = 50;           // Max steps per droplet
 		float inertia = 0.30f;          // How much droplet resists direction change (0-1)
 		float capacity_s = 4.0f; // Sediment capacity (P_capacity)
@@ -30,7 +30,7 @@ namespace Terrain {
 		float start_water = 1.0f;        // Initial droplet water volume
 		int erosion_radius = 3;          // Radius of erosion brush
 
-		int particles_per_frame = 100; // Number of particles/ iterations to simulate each frame when running in real-time
+		int particles_per_frame = 5000; // Number of particles/ iterations to simulate each frame when running in real-time
 	};
 
 	class HydraulicErosion {
