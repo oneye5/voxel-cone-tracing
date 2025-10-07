@@ -155,7 +155,7 @@ void Application::renderGUI() {
 
 	// setup window
 	ImGui::SetNextWindowPos(ImVec2(5, 5), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Once);
 	ImGui::Begin("Options", 0);
 
 	// display current camera parameters
