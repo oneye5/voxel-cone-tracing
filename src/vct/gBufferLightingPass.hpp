@@ -27,6 +27,8 @@ public:
 		float uSecondaryConeMaxStepMultiplier;
 		float uReflectionBlendLowerBound;
 		float uReflectionBlendUpperBound;
+		glm::vec3 uHorizonColor;
+		glm::vec3 uZenithColor;
 	};
 	light_pass_params params;
 
@@ -59,6 +61,8 @@ public:
 		params.uSecondaryConeMaxStepMultiplier = 0.25; // TODO unused
 		params.uReflectionBlendLowerBound = 0.75;
 		params.uReflectionBlendUpperBound = 1;
+		params.uHorizonColor = glm::vec3(0.5, 0.8, 0.9);
+		params.uZenithColor = glm::vec3(0.2, 0.4, 0.8);
 	}
 
 	~gBufferLightingPass() {
@@ -98,6 +102,9 @@ public:
 		glUniform3fv(glGetUniformLocation(shader, "uVoxelCenter"), 1, value_ptr(voxelizer->m_params.center));
 		glUniform1f(glGetUniformLocation(shader, "uReflectionBlendLowerBound"), params.uReflectionBlendLowerBound);
 		glUniform1f(glGetUniformLocation(shader, "uReflectionBlendUpperBound"), params.uReflectionBlendUpperBound);
+		glUniform3fv(glGetUniformLocation(shader, "uHorizonColor"), 1, value_ptr(params.uHorizonColor));
+		glUniform3fv(glGetUniformLocation(shader, "uZenithColor"), 1, value_ptr(params.uZenithColor));
+
 		auto invView = glm::inverse(view);
 		auto camPos = glm::vec3(invView[3]);
 		glUniform3fv(glGetUniformLocation(shader, "cameraPos"), 1, glm::value_ptr(camPos));

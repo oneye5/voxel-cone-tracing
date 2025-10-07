@@ -27,6 +27,8 @@ uniform vec3  uAmbientColor;
 uniform int uDebugIndex;
 uniform float uReflectionBlendLowerBound;
 uniform float uReflectionBlendUpperBound;
+uniform vec3 uHorizonColor;
+uniform vec3 uZenithColor;
 
 const float PI = 3.14159265359;
 #define APERTURE_SCALE 1.0
@@ -137,6 +139,11 @@ vec4 traceCone(vec3 origin, vec3 direction, float aperture, bool stopAtFirstHit)
     return vec4(accumulatedColor, 1.0 - accumulatedAlpha);
 }
 
+vec3 getSkyColor(vec3 viewDir) {
+    float t = smoothstep(0.0, 1.0, viewDir.y);
+    return mix(uHorizonColor, uZenithColor, t);
+}
+
 // Version of above that traces against all geometry instead of just emissives. This is used for reflections of the geometry. 
 vec4 traceConeAgainstGeometry(vec3 origin, vec3 direction, float aperture) {
     vec3 accumulatedColor = vec3(0.0);
@@ -168,7 +175,7 @@ vec4 traceConeAgainstGeometry(vec3 origin, vec3 direction, float aperture) {
 
             accumulatedColor = voxelRadiance;
             accumulatedAlpha = 1.0;
-            break;
+            return vec4(accumulatedColor, 1.0 - accumulatedAlpha);
         }
 
         if (accumulatedAlpha > (1.0 - uTransmittanceNeededForConeTermination))
@@ -177,7 +184,7 @@ vec4 traceConeAgainstGeometry(vec3 origin, vec3 direction, float aperture) {
         distance += coneDiameter * uStepMultiplier;
     }
 
-    return vec4(accumulatedColor, 1.0 - accumulatedAlpha);
+    return vec4(getSkyColor(direction), 0);
 }
 
 
@@ -207,17 +214,7 @@ vec4 indirectDiffuseLight(vec3 pos, vec3 normal) {
     return accumulatedResult / float(numSamples);
 }
 
-vec3 getSkyColor(vec3 viewDir) {
-    // Define horizon color and zenith color
-    vec3 horizonColor = vec3(0.5, 0.7, 0.9); // Light blue at the horizon
-    vec3 zenithColor = vec3(0.2, 0.4, 0.8);  // Deeper blue overhead
 
-    // Blend between horizon and zenith based on the up-component of the view direction (y-axis or z-axis depending on your coordinate system)
-    // Assuming Y is up, dot product with vec3(0,1,0) gives us the 'height'
-    float t = smoothstep(0.0, 1.0, viewDir.y); // Blend from horizon (viewDir.y = 0) to zenith (viewDir.y = 1)
-
-    return mix(horizonColor, zenithColor, t);
-}
 
 void main() {
     // read g buffer
@@ -232,9 +229,13 @@ void main() {
 
     // debug and early exit cases
     if (debugPass(worldPos, metallic, worldNormal, smoothness, albedo, emissiveFactor, emissiveRgb, spare) == 1) return;
-    if (length(worldNormal) < 0.1) {
-        vec3 dir = -normalize(uViewMatrix[2].xyz);
-        FragColor = vec4(0,0,0, 1); return; 
+    if (length(worldNormal) < 0.1) { // SKY CASE, no geometry hit, so fragment = sky color
+        // reconstruct view ray from screen space
+        vec2 ndc = texCoord * 2.0 - 1.0; // convert from 0 : 1  to -1 : 1
+        vec3 viewRayDir = normalize(vec3(ndc.x, ndc.y, -1.0));
+        // transform from view space to world space
+        vec3 worldViewDir = normalize(mat3(inverse(uViewMatrix)) * viewRayDir);
+        FragColor = vec4(getSkyColor(worldViewDir), 1); return;
     }
     if (emissiveFactor > uEmissiveThreshold) { FragColor = vec4(emissiveRgb * emissiveFactor, 1.0); return; }
 
@@ -255,7 +256,7 @@ void main() {
 
     // calculate specular and reflections
     vec3 reflectDir = reflect(-viewDir, worldNormal);
-    // aperture based on roughness squared (physically accurate)
+    // aperture based on roughness squared 
     float specularAperture = roughness * roughness * APERTURE_SCALE;
     specularAperture = clamp(specularAperture, 0.001, 0.5);
     vec3 indirectGeometryResult = vec3(0);

@@ -147,26 +147,29 @@ void Application::renderGUI() {
 	// setup window
 	ImGui::SetNextWindowPos(ImVec2(5, 5), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_Once);
-	ImGui::Begin("Options", 0);
+	ImGui::Begin("Rendering settings", 0);
 
 	// display current camera parameters
 	ImGui::Text("Application %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::SliderFloat("Pitch", &m_pitch, -pi<float>() / 2, pi<float>() / 2, "%.2f");
 	ImGui::SliderFloat("Yaw", &m_yaw, -pi<float>(), pi<float>(), "%.2f");
 	ImGui::DragFloat3("Camera Position", &m_cameraPosition[0], 0.1f);
+	ImGui::Separator();
 
-	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));}
+	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -10, 10)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));}
 	if (ImGui::SliderFloat("Light scale", &lightScale, 0, 2)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
 	ImGui::SliderFloat3("Light color", &light->lightColor[0], 0,1);
 
-	if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
+	ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
+	ImGui::SliderFloat3("Zenith color", &renderer->lightingPass->params.uZenithColor[0], 0, 1);
+	//if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
 
 #pragma region renderer params
 	ImGui::Separator();
 	ImGui::Text("Renderer params:");
 	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
 	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
-	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.01, 2);
+	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.05, 2);
 	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 1024);
 	ImGui::SliderFloat("Emissive threshold", &renderer->lightingPass->params.uEmissiveThreshold, 0, 1);
 	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
@@ -176,7 +179,7 @@ void Application::renderGUI() {
 	ImGui::SliderFloat("Ambient B", &renderer->lightingPass->params.uAmbientColor.b, 0.0, 0.5);
 	ImGui::SliderFloat("Reflection blend lower bound", &renderer->lightingPass->params.uReflectionBlendLowerBound, 0, 1);
 	ImGui::SliderFloat("Reflection blend upper bound", &renderer->lightingPass->params.uReflectionBlendUpperBound, 0, 1);
-	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 2000000);
+	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 10000000);
 
 	ImGui::Separator();
 	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
