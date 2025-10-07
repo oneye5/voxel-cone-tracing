@@ -28,8 +28,7 @@ BaseTerrain::BaseTerrain() : t_erosion(t_noise.width, t_noise.height) {
 	sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//terrain//basic_terrain.fs"));
 	shader = sb.build();
 
-	t_mesh.init_transform = glm::translate(glm::mat4(1), glm::vec3(-5,0,-5));
-	t_mesh.init_transform = glm::scale(t_mesh.init_transform, glm::vec3(DEFAULT_TERRAIN_SCALE, DEFAULT_TERRAIN_SCALE / 2, DEFAULT_TERRAIN_SCALE));
+	t_mesh.updateTransformCentered(t_settings.model_scale);
 	loadTextures();
 
 	// Set up the texture uniforms cuz only need to do once
@@ -109,9 +108,16 @@ static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub) {
 	return plane;
 }
 
+void PlaneTerrain::updateTransformCentered(vec3 scale) {
+	mat4 m_scale = glm::scale(mat4(1.0f), scale);
+	vec3 translation = vec3(0.0f - (scale.x/2.0f), 0, 0.0f - (scale.z/2.0f));
+	mat4 m_translation = glm::translate(mat4(1.0f), translation);
+	init_transform = m_translation * m_scale;
+}
+
 void BaseTerrain::renderUI() {
 	
-	ImGui::SetNextWindowPos(ImVec2(5, 200), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(5, 350), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_Once);
 	ImGui::Begin("Terrain Settings", 0);
 
@@ -119,7 +125,11 @@ void BaseTerrain::renderUI() {
 	ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
 	ImGui::SliderFloat("Amplitude", &t_settings.amplitude, 0.01f, 3.0f);
 	ImGui::Checkbox("Use procedural texturing", &useTexturing);
-	ImGui::Checkbox("Use faked lighting", &useFakedLighting);
+	//ImGui::Checkbox("Use faked lighting", &useFakedLighting);
+
+	if (ImGui::SliderFloat3("Terrain Scale", value_ptr(t_settings.model_scale), 1.0f, 20.0f)) {
+		t_mesh.updateTransformCentered(t_settings.model_scale);
+	}
 
 	if (ImGui::SliderInt("Plane Subdivisions", &plane_subs, 64, 1024)) {
 		changePlaneSubdivision(plane_subs);
@@ -157,6 +167,8 @@ void BaseTerrain::renderUI() {
 		}
 	} else {
 		ImGui::Text("Erosion sim running..");
+		float fraction = static_cast<float>(t_erosion.iterations_ran) / static_cast<float>(t_erosion.settings.iterations);
+		ImGui::ProgressBar(fraction, ImVec2(0.0f, 0.0f));
 		ImGui::Text("Currently on iteration %d / %d", t_erosion.iterations_ran, t_erosion.settings.iterations);
 		if (ImGui::Button("Abort")) {
 			erosion_running = false;

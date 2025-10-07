@@ -14,14 +14,18 @@ namespace Terrain {
 		float amplitude = 1.0f; // Amplitude of the height generation
 		float sea_level = 1.0f; // The y level to draw the water plane at
 
-		float min_rock_slope = 0.85f; // The min slope for rock texturing (0-1)
-		float max_grass_slope = 0.9f; // The max slope for grass texturing (0-1)
+		glm::vec3 model_scale = glm::vec3(10.0f, 5.0f, 10.0f); // The scale of the terrain
+
+		float min_rock_slope = 0.95f; // The min slope for rock texturing (0-1)
+		float max_grass_slope = 1.0f; // The max slope for grass texturing (0-1)
 	};
 
 	struct PlaneTerrain {
 		cgra::gl_mesh mesh;
 
 		glm::mat4 init_transform = glm::mat4(1.0f);
+		// Update the model transform matrix, calculates translation so terrain will be centered.
+		void updateTransformCentered(glm::vec3 scale);
 	};
 
 	struct Textures {
@@ -35,7 +39,7 @@ namespace Terrain {
 	class BaseTerrain : public Renderable {
 	public:
 		// The default amount to scale the terrain up by (for model transform)
-		static constexpr float DEFAULT_TERRAIN_SCALE = 5.0f;
+		static constexpr float DEFAULT_TERRAIN_SCALE = 10.0f;
 
 		GLuint shader;
 		Noise t_noise; // The noise to use for the terrain, contains texture

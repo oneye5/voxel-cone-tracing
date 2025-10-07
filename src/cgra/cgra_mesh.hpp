@@ -91,7 +91,7 @@ namespace cgra {
 	};
 
 	// Create and return a mesh builder containing a plane from 0,0,0 to 1,0,1 subdivided by the amount specified
-	static mesh_builder CREATE_PLANE(int x_sub, int z_sub, float size = 2.0f) {
+	static mesh_builder CREATE_PLANE(int x_sub, int z_sub, float size = 1.0f) {
 		mesh_builder mb;
 
 		const float x_step = size / static_cast<float>(x_sub);
