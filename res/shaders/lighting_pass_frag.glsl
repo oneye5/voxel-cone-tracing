@@ -29,6 +29,7 @@ uniform float uReflectionBlendLowerBound;
 uniform float uReflectionBlendUpperBound;
 uniform vec3 uHorizonColor;
 uniform vec3 uZenithColor;
+uniform bool uToneMapEnable;
 
 const float PI = 3.14159265359;
 #define APERTURE_SCALE 1.0
@@ -44,8 +45,14 @@ const float PI = 3.14159265359;
     Fresnel
 
     Metallics
+
+    Filmic tone mapping
 */  
 
+vec3 toneMapFilmic(vec3 color) {
+    color = max(vec3(0.0), color - 0.004);
+    return (color * (6.2 * color + 0.5)) / (color * (6.2 * color + 1.7) + 0.06);
+}
 
 vec3 worldToVoxel(vec3 pos) {
     return (pos - uVoxelCenter + uVoxelWorldSize * 0.5) / uVoxelWorldSize;
@@ -272,5 +279,7 @@ void main() {
     vec3 globalIllumination = (diffuseGI * uDiffuseBrightnessMultiplier) + specularGI;
     vec3 ambient = uAmbientColor * albedo * ambientOcclusion;
     vec3 finalColor = globalIllumination + ambient + indirectSpecular;
+    if (uToneMapEnable)
+        finalColor = toneMapFilmic(finalColor);
     FragColor = vec4(finalColor, 1.0);
 }

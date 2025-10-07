@@ -29,6 +29,7 @@ public:
 		float uReflectionBlendUpperBound;
 		glm::vec3 uHorizonColor;
 		glm::vec3 uZenithColor;
+		bool uToneMapEnable;
 	};
 	light_pass_params params;
 
@@ -54,15 +55,16 @@ public:
 		params.uMaxSteps = 256;
 		params.uEmissiveThreshold = 0.0;
 		params.uNumDiffuseCones = 32;
-		params.uDiffuseBrightnessMultiplier = 115000.0;
+		params.uDiffuseBrightnessMultiplier = 20000.0;
 		params.uOccludeThresholdForSecondaryCone = 0.8; // TODO unused
-		params.uTransmittanceNeededForConeTermination = 0.1;
+		params.uTransmittanceNeededForConeTermination = 0.01;
 		params.uAmbientColor = glm::vec3(0.2);
 		params.uSecondaryConeMaxStepMultiplier = 0.25; // TODO unused
 		params.uReflectionBlendLowerBound = 0.75;
 		params.uReflectionBlendUpperBound = 1;
 		params.uHorizonColor = glm::vec3(0.5, 0.8, 0.9);
 		params.uZenithColor = glm::vec3(0.2, 0.4, 0.8);
+		params.uToneMapEnable = true;
 	}
 
 	~gBufferLightingPass() {
@@ -104,6 +106,8 @@ public:
 		glUniform1f(glGetUniformLocation(shader, "uReflectionBlendUpperBound"), params.uReflectionBlendUpperBound);
 		glUniform3fv(glGetUniformLocation(shader, "uHorizonColor"), 1, value_ptr(params.uHorizonColor));
 		glUniform3fv(glGetUniformLocation(shader, "uZenithColor"), 1, value_ptr(params.uZenithColor));
+		glUniform1i(glGetUniformLocation(shader, "uToneMapEnable"), params.uToneMapEnable);
+
 
 		auto invView = glm::inverse(view);
 		auto camPos = glm::vec3(invView[3]);

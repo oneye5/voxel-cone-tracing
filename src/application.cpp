@@ -34,7 +34,7 @@ ExampleRenderable* exampleRenderable = nullptr;
 ExampleRenderable* exampleRenderable2 = nullptr;
 
 glm::vec3 lightPos;
-float lightScale;
+glm::vec3 lightScale;
 
 Application::Application(GLFWwindow* window) : m_window(window) {
 	int width, height;
@@ -50,10 +50,10 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// modifactions
-	lightPos = glm::vec3(-3.5, 10, -5.5);
-	lightScale = 1.0;
+	lightPos = glm::vec3(-0, 10, -0);
+	lightScale = glm::vec3(2,0.5,2);
 	light->modelTransform = glm::translate(glm::mat4(1), lightPos); 
-	light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));
+	light->modelTransform = glm::scale(light->modelTransform, lightScale);
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0.5, 4, 0.5));
 	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.3));
 	exampleRenderable2->mesh = cgra::load_wavefront_data(CGRA_SRCDIR + std::string("//res//assets//axis.obj")).build();
@@ -156,8 +156,8 @@ void Application::renderGUI() {
 	ImGui::DragFloat3("Camera Position", &m_cameraPosition[0], 0.1f);
 	ImGui::Separator();
 
-	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -10, 10)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));}
-	if (ImGui::SliderFloat("Light scale", &lightScale, 0, 2)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
+	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));}
+	if (ImGui::SliderFloat3("Light scale", &lightScale[0], 0, 4)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
 	ImGui::SliderFloat3("Light color", &light->lightColor[0], 0,1);
 
 	ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
@@ -168,18 +168,16 @@ void Application::renderGUI() {
 	ImGui::Separator();
 	ImGui::Text("Renderer params:");
 	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
+	ImGui::Checkbox("Filmic tone mapping", &renderer->lightingPass->params.uToneMapEnable);
 	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
 	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.05, 2);
 	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 1024);
-	ImGui::SliderFloat("Emissive threshold", &renderer->lightingPass->params.uEmissiveThreshold, 0, 1);
 	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
 	ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
-	ImGui::SliderFloat("Ambient R", &renderer->lightingPass->params.uAmbientColor.r, 0.0, 0.5);
-	ImGui::SliderFloat("Ambient G", &renderer->lightingPass->params.uAmbientColor.g, 0.0, 0.5);
-	ImGui::SliderFloat("Ambient B", &renderer->lightingPass->params.uAmbientColor.b, 0.0, 0.5);
+	ImGui::SliderFloat3("Ambient RGB", &renderer->lightingPass->params.uAmbientColor[0], 0.0, 1);
 	ImGui::SliderFloat("Reflection blend lower bound", &renderer->lightingPass->params.uReflectionBlendLowerBound, 0, 1);
 	ImGui::SliderFloat("Reflection blend upper bound", &renderer->lightingPass->params.uReflectionBlendUpperBound, 0, 1);
-	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 10000000);
+	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 10000);
 
 	ImGui::Separator();
 	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);

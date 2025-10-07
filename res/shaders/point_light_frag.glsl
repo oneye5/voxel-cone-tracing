@@ -33,7 +33,7 @@ void writeRenderInfo(MaterialData m) {
         if (any(lessThan(vpos, vec3(0))) || any(greaterThan(vpos, vec3(1)))) return;
         ivec3 texCoord = ivec3(vpos * float(uVoxelRes - 1));
 
-        int splatRadius = 1;
+        int splatRadius = 0;
         for (int x = -splatRadius; x <= splatRadius; ++x) {
             for (int y = -splatRadius; y <= splatRadius; ++y) {
                 for (int z = -splatRadius; z <= splatRadius; ++z) {
