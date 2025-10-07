@@ -14,7 +14,7 @@ namespace Terrain {
 		float amplitude = 1.0f; // Amplitude of the height generation
 		float sea_level = 0.0f; // The y level to draw the water plane at
 
-		glm::vec3 model_scale = glm::vec3(10.0f, 5.0f, 10.0f); // The scale of the terrain
+		glm::vec3 model_scale = glm::vec3(5.0f, 2.5f, 5.0f); // The scale of the terrain
 
 		float min_rock_slope = 0.95f; // The min slope for rock texturing (0-1)
 		float max_grass_slope = 1.0f; // The max slope for grass texturing (0-1)

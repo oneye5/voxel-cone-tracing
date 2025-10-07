@@ -103,7 +103,7 @@ void BaseTerrain::changePlaneSubdivision(int subs) {
 // with provided subdivisions
 static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub) {
 	PlaneTerrain plane;
-	cgra::mesh_builder mb = cgra::CREATE_PLANE(x_sub, z_sub);
+	cgra::mesh_builder mb = cgra::CREATE_PLANE(x_sub, z_sub, 2.0f);
 	
 	plane.mesh = mb.build();
 	return plane;
@@ -111,7 +111,7 @@ static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub) {
 
 void PlaneTerrain::updateTransformCentered(vec3 scale) {
 	mat4 m_scale = glm::scale(mat4(1.0f), scale);
-	vec3 translation = vec3(0.0f - (scale.x/2.0f), 0, 0.0f - (scale.z/2.0f));
+	vec3 translation = vec3(-2.0f - (scale.x/2.0f), 0, -2.0f - (scale.z/2.0f));
 	mat4 m_translation = glm::translate(mat4(1.0f), translation);
 	init_transform = m_translation * m_scale;
 }
