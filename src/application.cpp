@@ -117,12 +117,9 @@ void Application::render() {
 	glViewport(0, 0, width, height); // set the viewport to draw to the entire window
 
 	// clear the back-buffer
-	glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// enable flags for normal/forward rendering
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
 
 	// projection matrix
 	mat4 proj = perspective(1.f, float(width) / height, 0.1f, 1000.f);
@@ -131,12 +128,6 @@ void Application::render() {
 	mat4 view = rotate(mat4(1), m_pitch, vec3(1, 0, 0))
 		* rotate(mat4(1), m_yaw, vec3(0, 1, 0))
 		* translate(mat4(1), -m_cameraPosition);
-
-
-	// helpful draw options
-	if (m_show_grid) drawGrid(view, proj);
-	if (m_show_axis) drawAxis(view, proj);
-	glPolygonMode(GL_FRONT_AND_BACK, (m_showWireframe) ? GL_LINE : GL_FILL);
 
 
 	if (dirtyVoxels) {

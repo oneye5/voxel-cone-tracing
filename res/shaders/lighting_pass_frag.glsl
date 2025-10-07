@@ -1,4 +1,4 @@
-﻿#version 440
+#version 440
 in vec2 texCoord;
 out vec4 FragColor;
 
@@ -207,6 +207,18 @@ vec4 indirectDiffuseLight(vec3 pos, vec3 normal) {
     return accumulatedResult / float(numSamples);
 }
 
+vec3 getSkyColor(vec3 viewDir) {
+    // Define horizon color and zenith color
+    vec3 horizonColor = vec3(0.5, 0.7, 0.9); // Light blue at the horizon
+    vec3 zenithColor = vec3(0.2, 0.4, 0.8);  // Deeper blue overhead
+
+    // Blend between horizon and zenith based on the up-component of the view direction (y-axis or z-axis depending on your coordinate system)
+    // Assuming Y is up, dot product with vec3(0,1,0) gives us the 'height'
+    float t = smoothstep(0.0, 1.0, viewDir.y); // Blend from horizon (viewDir.y = 0) to zenith (viewDir.y = 1)
+
+    return mix(horizonColor, zenithColor, t);
+}
+
 void main() {
     // read g buffer
     vec3 worldPos = texture(gBufferPosition, texCoord).xyz;
@@ -220,7 +232,10 @@ void main() {
 
     // debug and early exit cases
     if (debugPass(worldPos, metallic, worldNormal, smoothness, albedo, emissiveFactor, emissiveRgb, spare) == 1) return;
-    if (length(worldNormal) < 0.1) { FragColor = vec4(albedo, 1.0); return; }
+    if (length(worldNormal) < 0.1) {
+        vec3 dir = -normalize(uViewMatrix[2].xyz);
+        FragColor = vec4(0,0,0, 1); return; 
+    }
     if (emissiveFactor > uEmissiveThreshold) { FragColor = vec4(emissiveRgb * emissiveFactor, 1.0); return; }
 
     // setup vars
