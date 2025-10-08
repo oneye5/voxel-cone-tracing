@@ -32,6 +32,7 @@ PointLightRenderable* light = nullptr;
 Terrain::BaseTerrain* t_terrain = nullptr;
 ExampleRenderable* exampleRenderable = nullptr;
 ExampleRenderable* exampleRenderable2 = nullptr;
+Terrain::WaterPlane* t_water = nullptr;
 
 glm::vec3 lightPos;
 glm::vec3 lightScale;
@@ -43,8 +44,8 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 
 
 	t_terrain = new Terrain::BaseTerrain();
-	// t_water = new Terrain::WaterPlane();
-	// t_terrain->water_plane = t_water;
+	t_water = new Terrain::WaterPlane();
+	t_terrain->water_plane = t_water;
 	light = new PointLightRenderable();
 	exampleRenderable = new ExampleRenderable();
 	exampleRenderable2 = new ExampleRenderable();
@@ -62,7 +63,7 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 
 	// add renderables
 	renderer->addRenderable(t_terrain);
-	// renderer->addRenderable(t_water);
+	renderer->addRenderable(t_water);
 	renderer->addRenderable(light);
 	renderer->addRenderable(exampleRenderable);
 	//renderer->addRenderable(exampleRenderable2);

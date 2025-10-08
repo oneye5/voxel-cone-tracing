@@ -41,6 +41,16 @@ void Noise::makeEditUI(bool use_own_window) {
 		ImGui::Begin("Noise", 0);
 	}
 
+	if (ImGui::BeginCombo("Noise Presets", "N/A", ImGuiComboFlags_NoPreview)) {
+		for (const auto& p: Presets::NOISE_PRESET_MAP) {
+			if (ImGui::Selectable(p.first, false)) {
+				setNoiseSettings(p.second);
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
 	int w = width;
 	if (ImGui::SliderInt("Texture size (square)", &w, 64, 1024)) {
 		changeTextureSize(w, w);
@@ -133,25 +143,17 @@ void Noise::makeEditUI(bool use_own_window) {
 	settings_updated |= ImGui::Checkbox("Use Domain Warping", &settings.use_domain_warp);
 	
 	if (settings.use_domain_warp) {
-		// Domain Warp Type
-		static const std::pair<const char*, FastNoiseLite::DomainWarpType> warp_types[] = {
-			{"OpenSimplex2", FastNoiseLite::DomainWarpType_OpenSimplex2},
-			{"OpenSimplex2Reduced", FastNoiseLite::DomainWarpType_OpenSimplex2Reduced},
-			{"BasicGrid", FastNoiseLite::DomainWarpType_BasicGrid}
+		static const std::map<FastNoiseLite::DomainWarpType, const char*> warp_types = {
+			{FastNoiseLite::DomainWarpType_OpenSimplex2, "OpenSimplex2"},
+			{FastNoiseLite::DomainWarpType_OpenSimplex2Reduced, "OpenSimplex2Reduced"},
+			{FastNoiseLite::DomainWarpType_BasicGrid, "BasicGrid"}
 		};
 
-		const char* current_warp_name = "Unknown";
-		for (const auto& item: warp_types) {
-			if (item.second == settings.domain_warp_type) {
-				current_warp_name = item.first;
-				break;
-			}
-		}
-
+		const char* current_warp_name = warp_types.at(settings.domain_warp_type);
 		if (ImGui::BeginCombo("Warp Type", current_warp_name)) {
 			for (const auto& item: warp_types) {
-				if (ImGui::Selectable(item.first, settings.domain_warp_type == item.second)) {
-					settings.domain_warp_type = item.second;
+				if (ImGui::Selectable(item.second, settings.domain_warp_type == item.first)) {
+					settings.domain_warp_type = item.first;
 					settings_updated = true;
 				}
 			}
@@ -161,6 +163,28 @@ void Noise::makeEditUI(bool use_own_window) {
 		settings_updated |= ImGui::DragInt("Warp Seed", &settings.domain_seed, 1.0f, 1, 0);
 		settings_updated |= ImGui::SliderFloat("Warp Frequency", &settings.domain_frequency, 0.001f, 0.1f);
 		settings_updated |= ImGui::DragFloat("Warp Amplitude", &settings.domain_warp_amp, 1.0f, 0.0f, 300.0f);
+
+		ImGui::Text("Domain Warp Fractal Settings");
+		static const std::map<FastNoiseLite::FractalType, const char*> domain_fractal_types = {
+			{FastNoiseLite::FractalType_None, "None"},
+			{FastNoiseLite::FractalType_DomainWarpProgressive, "Progressive"},
+			{FastNoiseLite::FractalType_DomainWarpIndependent, "Independent"}
+		};
+		const char* current_domain_fractal_type = domain_fractal_types.at(settings.domain_warp_fractal_type);
+		if (ImGui::BeginCombo("Domain Fractal Type", current_domain_fractal_type)) {
+			for (const auto& item: domain_fractal_types) {
+				if (ImGui::Selectable(item.second, settings.domain_warp_fractal_type == item.first)) {
+					settings.domain_warp_fractal_type = item.first;
+					settings_updated = true;
+				}
+			}
+
+			ImGui::EndCombo();
+		}
+
+		settings_updated |= ImGui::DragInt("Domain Octaves", &settings.domain_fractal_octaves, 0.2f, 1, 20);
+		settings_updated |= ImGui::DragFloat("Domain Lacunarity", &settings.domain_fractal_lacunarity, 0.01f, 0.0f, 10.0f);
+		settings_updated |= ImGui::DragFloat("Domain Gain", &settings.domain_fractal_gain, 0.01f, 0.0f, 10.0f);
 	}
 
 	if (settings_updated) {
@@ -224,7 +248,6 @@ void Noise::generateHeightmap(bool update_pixels) {
 	}
 }
 
-// TODO - check this isn't slow as hell
 void Noise::updateNoiseFromSettings() {
 	noise.SetSeed(settings.seed);
 	noise.SetFrequency(settings.frequency);
@@ -245,6 +268,9 @@ void Noise::updateNoiseFromSettings() {
 	domainWarp.SetFrequency(settings.domain_frequency);
 	domainWarp.SetDomainWarpType(settings.domain_warp_type);
 	domainWarp.SetDomainWarpAmp(settings.domain_warp_amp);
+	domainWarp.SetFractalType(settings.domain_warp_fractal_type);
+	domainWarp.SetFractalOctaves(settings.domain_fractal_octaves);
+	domainWarp.SetFractalGain(settings.domain_fractal_gain);
 
 }
 

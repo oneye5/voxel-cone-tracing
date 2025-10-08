@@ -11,10 +11,13 @@
 using namespace Terrain;
 using namespace glm;
 
-WaterPlane::WaterPlane(GLuint texid) : plane_mesh(cgra::CREATE_PLANE(256, 256).build()), water_texture(texid) {
+WaterPlane::WaterPlane(GLuint texid) : plane_mesh(cgra::CREATE_PLANE(256, 256, 2.0f).build()), water_texture(texid) {
 	if (!water_texture) { // Water texture not supplied
 		water_texture = cgra::rgba_image(WATER_TEXTURE_PATH).uploadTexture();
+	}
 
+	if (!water_normal_texture) {
+		water_normal_texture = cgra::rgba_image(WATER_NORMAL_TEX_PATH).uploadTexture();
 	}
 
 	if (!shader) {
@@ -24,15 +27,16 @@ WaterPlane::WaterPlane(GLuint texid) : plane_mesh(cgra::CREATE_PLANE(256, 256).b
 		shader = sb.build();
 	}
 
-	update_transform({10.0f, 5.0, 10.0f}, 0.0f);
+	update_transform({5.0f, 2.5f, 5.0f}, 0.0f);
 
 	glUseProgram(shader);
 	glUniform1i(glGetUniformLocation(shader, "water_texture"), 0);
+	glUniform1i(glGetUniformLocation(shader, "water_normal_texture"), 1);
 }
 
 void WaterPlane::update_transform(glm::vec3 model_scale, float sea_level) {
 	mat4 m_scale = glm::scale(mat4(1.0f), model_scale);
-	vec3 trans = vec3(0.0f - (model_scale.x / 2.0f), sea_level, 0.0f - (model_scale.z / 2.0f));
+	vec3 trans = vec3(-2.0f - (model_scale.x / 2.0f), sea_level, -2.0f - (model_scale.z / 2.0f));
 	mat4 m_trans = glm::translate(mat4(1.0f), trans);
 
 	model_transform = m_trans * m_scale;
@@ -54,6 +58,11 @@ void WaterPlane::draw() {
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, water_texture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, water_normal_texture);
+
+	glUniform1f(glGetUniformLocation(shader, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(shader, "smoothness"), smoothness);
 
 	plane_mesh.draw();
 }

@@ -129,7 +129,7 @@ void BaseTerrain::renderUI() {
 	ImGui::SliderFloat("Amplitude", &t_settings.amplitude, 0.01f, 3.0f);
 	ImGui::Checkbox("Use texturing", &useTexturing);
 	//ImGui::SliderFloat("Max Height", &t_settings.max_height, 0.20, 2.0);
-	ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
+	//ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
 	//ImGui::Checkbox("Use faked lighting", &useFakedLighting);
 
 	if (ImGui::SliderInt("Plane Subdivisions", &plane_subs, 64, 1024)) {
@@ -143,6 +143,12 @@ void BaseTerrain::renderUI() {
 	ImGui::Text("Texturing settings");
 	ImGui::SliderFloat("Min Rock Slope", &t_settings.min_rock_slope, 0.0f, t_settings.max_grass_slope-0.001f);
 	ImGui::SliderFloat("Max Grass Slope", &t_settings.max_grass_slope, 0.0f, 1.0f);
+
+	if (water_plane) {
+		ImGui::Text("Test water settings");
+		ImGui::SliderFloat("Water metallicness", &water_plane->metallic, 0.0f, 1.0f);
+		ImGui::SliderFloat("Water smoothness", &water_plane->smoothness, 0.0f, 1.0f);
+	}
 
 	ImGui::Separator();
 

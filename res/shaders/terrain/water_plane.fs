@@ -28,7 +28,12 @@ in VertexData {
 } f_in;
 
 uniform sampler2D water_texture;
-const float TEXTURE_SCALAR = 5.0f; // Don't just want the single texture for entire thing so repreat
+uniform sampler2D water_normal_texture;
+const float TEXTURE_SCALAR = 8.0f; // Don't just want the single texture for entire thing so repreat
+
+uniform float metallic;
+uniform float smoothness;
+
 void writeRenderInfo(MaterialData m) {
     if (uRenderMode == 0) { // voxel
         // center the voxel grid around uVoxelCenter
@@ -59,17 +64,21 @@ void writeRenderInfo(MaterialData m) {
         gEmissive = vec4(m.emi * m.emiFac, 0);
     }
 }
+
 void main() {
 	MaterialData m;
 
-	vec3 tex_col = texture(water_texture, f_in.textureCoord * 8.0f).rgb;
+	vec3 tex_col = texture(water_texture, f_in.textureCoord * TEXTURE_SCALAR).rgb;
+	vec3 norm = texture(water_normal_texture, f_in.textureCoord * 12.0f).rgb;
+	norm = vec3(norm.x, norm.z, norm.y);
+	norm = normalize(norm * 2.0 - 1.0);
 	
 	m.pos = f_in.worldPos;
-	m.nrm = f_in.normal;
+	m.nrm = norm;
 	m.alb = tex_col;
 	m.emi = vec3(0.0);
-	m.mtl = 0.7;
-	m.smoothness = 0.7;
+	m.mtl = metallic;
+	m.smoothness = smoothness;
 	m.emiFac = 0.0;
 
 	writeRenderInfo(m);

@@ -192,7 +192,7 @@ void HydraulicErosion::simulateDroplet(int steps) {
 		float capacity = std::max(-h_dif, settings.min_slope) * c_particle.c_vel * c_particle.c_water * settings.capacity_s;
 		if (c_particle.c_sediment > capacity || h_dif > 0.0) {
 			// Deposit if carrying too much or going uphill
-			const float amount_to_deposit = (h_dif > 0.0) ? std::min(h_dif, c_particle.c_sediment) : (c_particle.c_sediment - capacity) * settings.deposition;
+			const float amount_to_deposit = (h_dif > 0.0) ? std::min(h_dif, c_particle.c_sediment) : (c_particle.c_sediment - capacity) * settings.deposit_speed;
 			c_particle.c_sediment -= amount_to_deposit;
 			
 			applyDeposition(pos_old, amount_to_deposit);
@@ -294,8 +294,8 @@ void HydraulicErosion::renderUI(bool use_own_window) {
     
 	if (ImGui::CollapsingHeader("Sediment Properties")) {
 		settingsChanged |= ImGui::SliderFloat("Sediment Capacity", &erosionSettings.capacity_s, 1.0f, 20.0f);
-		settingsChanged |= ImGui::SliderFloat("Min Sediment Capacity", &erosionSettings.min_slope, 0.001f, 0.1f);
-		settingsChanged |= ImGui::SliderFloat("Deposit Speed", &erosionSettings.deposition, 0.01f, 1.0f);
+		settingsChanged |= ImGui::SliderFloat("Min Slope", &erosionSettings.min_slope, 0.001f, 0.1f);
+		settingsChanged |= ImGui::SliderFloat("Deposit Speed", &erosionSettings.deposit_speed, 0.01f, 1.0f);
 		settingsChanged |= ImGui::SliderFloat("Erosion Speed", &erosionSettings.erode_speed, 0.01f, 1.0f);
 	}
 

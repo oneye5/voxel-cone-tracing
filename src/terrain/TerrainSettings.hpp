@@ -26,12 +26,17 @@ namespace Terrain {
 		FastNoiseLite::CellularReturnType cellular_return_type = FastNoiseLite::CellularReturnType_Distance; // Value that cellular function returns
 		float cellular_jitter = 1.0f; // Maximum distance a cellular point can move from grid pos
 
-		// Domain warp settings (NOTE - i think i might be missing a few like fractal type)
+		// Domain warp settings
 		bool use_domain_warp = false; // Whether or not to use domain warp
 		FastNoiseLite::DomainWarpType domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2; // domain warp algorithm
 		float domain_warp_amp = 1.0f; // Max warp distance from original pos
 		int domain_seed = 1337;
 		float domain_frequency = 0.005f;
+		// Domain Fractal settings
+		FastNoiseLite::FractalType domain_warp_fractal_type = FastNoiseLite::FractalType_None;
+		int domain_fractal_octaves = 3;
+		float domain_fractal_lacunarity = 2.0f;
+		float domain_fractal_gain = 0.5f;
 
 		// Print out settings in struct form to stdout
 		// TODO - add domain warp stuff
@@ -114,7 +119,7 @@ namespace Terrain {
 			std::printf("\n"); // Add a newline for separation
 			std::printf("\t.cellular_dist_function = %s,\n", cellular_dist_str);
 			std::printf("\t.cellular_return_type = %s,\n", cellular_return_str);
-			std::printf("\t.cellular_jitter = %gf\n", cellular_jitter); // Last one shouldn't have a trailing comma
+			std::printf("\t.cellular_jitter = %gf,\n", cellular_jitter); // Last one shouldn't have a trailing comma
 
 			// Domain warp
 			std::printf("\t.domain_warp_type = %s,\n", domain_warp_type_str);
@@ -144,6 +149,104 @@ namespace Terrain {
 			.cellular_dist_function = FastNoiseLite::CellularDistanceFunction_EuclideanSq,
 			.cellular_return_type = FastNoiseLite::CellularReturnType_Distance,
 			.cellular_jitter = 1.0f
+		};
+
+		static constexpr NoiseSettings cellularHills = NoiseSettings{
+			.seed = 1337,
+			.frequency = 0.016f,
+			.noise_type = FastNoiseLite::NoiseType_Cellular,
+			.noise_exp = 1.0f,
+
+			.fractal_type = FastNoiseLite::FractalType_None,
+			.fractal_octaves = 3,
+			.fractal_lacunarity = 2.0f,
+			.fractal_gain = 0.5f,
+			.fractal_weighted_strength = 0.0f,
+			.fractal_pingpong_strength = 2.0,
+
+			.cellular_dist_function = FastNoiseLite::CellularDistanceFunction_Manhattan,
+			.cellular_return_type = FastNoiseLite::CellularReturnType_CellValue,
+			.cellular_jitter = 1.0f,
+			.domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2,
+			.domain_warp_amp = 1.0f,
+			.domain_seed = 1337,
+			.domain_frequency = 0.005f,
+		};
+
+		static constexpr NoiseSettings flatHills = NoiseSettings{
+			.seed = 1337,
+			.frequency = 0.026f,
+			.noise_type = FastNoiseLite::NoiseType_Perlin,
+			.noise_exp = 1.0f,
+
+			.fractal_type = FastNoiseLite::FractalType_Ridged,
+			.fractal_octaves = 3,
+			.fractal_lacunarity = 0.71f,
+			.fractal_gain = 1.51f,
+			.fractal_weighted_strength = 0.0f,
+			.fractal_pingpong_strength = 2.0f,
+
+			.cellular_dist_function = FastNoiseLite::CellularDistanceFunction_Manhattan,
+			.cellular_return_type = FastNoiseLite::CellularReturnType_CellValue,
+			.cellular_jitter = 1.0f,
+			.domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2,
+			.domain_warp_amp = 1.0f,
+			.domain_seed = 1337,
+			.domain_frequency = 0.005f,
+		};
+
+		static constexpr NoiseSettings lotsOCircles = NoiseSettings{
+			.seed = 1337,
+			.frequency = 0.018f,
+			.noise_type = FastNoiseLite::NoiseType_Perlin,
+			.noise_exp = 1.0f,
+
+			.fractal_type = FastNoiseLite::FractalType_FBm,
+			.fractal_octaves = 3,
+			.fractal_lacunarity = 0.39f,
+			.fractal_gain = 1.39f,
+			.fractal_weighted_strength = 0.2f,
+			.fractal_pingpong_strength = 2.0f,
+
+			.cellular_dist_function = FastNoiseLite::CellularDistanceFunction_EuclideanSq,
+			.cellular_return_type = FastNoiseLite::CellularReturnType_Distance,
+			.cellular_jitter = 1.0f,
+			.use_domain_warp = true,
+			.domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2Reduced,
+			.domain_warp_amp = 123.0f,
+			.domain_seed = 1337,
+			.domain_frequency = 0.034f,
+		};
+
+		// Using a larger amplitude helps
+		static constexpr NoiseSettings funnyRidges = NoiseSettings{
+			.seed = 1337,
+			.frequency = 0.005f,
+			.noise_type = FastNoiseLite::NoiseType_Perlin,
+			.noise_exp = 1.0f,
+
+			.fractal_type = FastNoiseLite::FractalType_Ridged,
+			.fractal_octaves = 5,
+			.fractal_lacunarity = 1.47f,
+			.fractal_gain = 0.41f,
+			.fractal_weighted_strength = 0.43f,
+			.fractal_pingpong_strength = 2.0f,
+
+			.cellular_dist_function = FastNoiseLite::CellularDistanceFunction_EuclideanSq,
+			.cellular_return_type = FastNoiseLite::CellularReturnType_Distance,
+			.cellular_jitter = 1.0f,
+			.domain_warp_type = FastNoiseLite::DomainWarpType_OpenSimplex2,
+			.domain_warp_amp = 1.0f,
+			.domain_seed = 1337,
+			.domain_frequency = 0.005f,
+		};
+
+		const std::map<const char*, NoiseSettings> NOISE_PRESET_MAP = {
+			{"Test Settings 1", testSettings1},
+			{"Cellular Hills", cellularHills},
+			{"Flat Hills", flatHills},
+			{"lots O Circles (Domain Warp)", lotsOCircles},
+			{"Funny Ridges", funnyRidges}
 		};
 	}
 }
