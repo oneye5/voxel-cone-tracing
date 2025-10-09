@@ -171,8 +171,8 @@ void loadScene1() {
 	rightWall->modelTransform = glm::scale(rightWall->modelTransform, vec3(wallThickness, roomSize * wallLen, roomSize * wallLen));
 
 	// Light source (area light above center)
-	lightPos = vec3(0, roomSize * 0.9, 0);
-	lightScale = vec3(roomSize / 10, roomSize / 10, roomSize / 10);
+	lightPos = vec3(0, roomSize * 0.93, 0);
+	lightScale = vec3(roomSize / 8, roomSize / 8, roomSize / 8);
 	light->modelTransform = glm::translate(mat4(1), lightPos);
 	light->modelTransform = glm::scale(light->modelTransform, lightScale);
 
@@ -199,8 +199,10 @@ void loadScene1() {
 	renderer->voxelizer->setWorldSize(15.25);
 	light->brightness = 1;
 	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.02);
+	renderer->lightingPass->params.uStepMultiplier = 1.5;
+	renderer->lightingPass->params.uDiffuseBrightnessMultiplier = 100000;
 	renderer->lightingPass->params.uZenithColor = glm::vec3(0);
-	renderer->lightingPass->params.uHorizonColor = glm::vec3(0, 0, 0.05);
+	renderer->lightingPass->params.uHorizonColor = glm::vec3(0, 0, 0.01);
 }
 
 void loadScene2() {
@@ -307,7 +309,9 @@ void Application::renderGUI() {
 		ImGui::SliderFloat("Light brightness", &light->brightness, 1, 100000);
 		ImGui::SliderFloat3("Ambient RGB", &renderer->lightingPass->params.uAmbientColor[0], 0.0, 1);
 		ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 100000);
-		ImGui::SliderFloat("Reflection cone aperature", &renderer->lightingPass->params.uReflectionAperture, 0, 1);
+		ImGui::SliderFloat("AO multiplier", &renderer->lightingPass->params.uAO, 0, 2);
+		ImGui::SliderFloat("Contrast", &renderer->lightingPass->params.uContrast, 0, 2);
+
 	}
 	if (ImGui::CollapsingHeader("Sky settings", ImDrawFlags_Closed)) {
 		ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
@@ -317,7 +321,6 @@ void Application::renderGUI() {
 	
 #pragma region renderer params
 	ImGui::Separator();
-	ImGui::Text("Renderer params:");
 	if (ImGui::CollapsingHeader("Cone settings", ImDrawFlags_Closed)) {
 		ImGui::Checkbox("Filmic tone mapping", &renderer->lightingPass->params.uToneMapEnable);
 		ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
