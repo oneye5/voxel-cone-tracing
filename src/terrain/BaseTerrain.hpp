@@ -60,6 +60,7 @@ namespace Terrain {
 		WaterPlane* water_plane = nullptr; // The water plane (passed as pointer so renderer can draw it and terrain can set settings)
 
 		bool useFakedLighting = false; // whether to use faked lighting for testing
+		bool draw_from_min = true; // Whether or not to get the terrain shader to draw with the min height at y=0
 
 		void renderUI();
 		BaseTerrain();

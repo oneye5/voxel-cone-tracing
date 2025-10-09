@@ -59,11 +59,12 @@ void BaseTerrain::draw() {
 	glUniform3fv(glGetUniformLocation(shader, "uColor"), 1, value_ptr(vec3{1, 1, 1}));
 
 	glUniform1f(glGetUniformLocation(shader, "max_height"), t_settings.max_height);
-	glUniform1f(glGetUniformLocation(shader, "min_height"), t_settings.min_height);
 	glUniform1i(glGetUniformLocation(shader, "useTexturing"), useTexturing);
 	glUniform1i(glGetUniformLocation(shader, "useFakedLighting"), useFakedLighting);
 	glUniform1i(glGetUniformLocation(shader, "subdivisions"), plane_subs);
 	glUniform1f(glGetUniformLocation(shader, "amplitude"), t_settings.amplitude);
+	glUniform1i(glGetUniformLocation(shader, "draw_from_min"), draw_from_min);
+	glUniform1f(glGetUniformLocation(shader, "min_height"), t_noise.min_height);
 
 	glUniform1f(glGetUniformLocation(shader, "min_rock_slope"), t_settings.min_rock_slope);
 	glUniform1f(glGetUniformLocation(shader, "max_grass_slope"), t_settings.max_grass_slope);
@@ -127,17 +128,12 @@ void BaseTerrain::renderUI() {
 	}
 
 	ImGui::SliderFloat("Amplitude", &t_settings.amplitude, 0.01f, 3.0f);
+	ImGui::Checkbox("Draw from min height", &draw_from_min);
 	ImGui::Checkbox("Use texturing", &useTexturing);
-	//ImGui::SliderFloat("Max Height", &t_settings.max_height, 0.20, 2.0);
-	//ImGui::SliderFloat("Min Height", &t_settings.min_height, 0.0f, 1.0f);
 	//ImGui::Checkbox("Use faked lighting", &useFakedLighting);
 
 	if (ImGui::SliderInt("Plane Subdivisions", &plane_subs, 64, 1024)) {
 		changePlaneSubdivision(plane_subs);
-	}
-
-	if (water_plane && ImGui::SliderFloat("Sea Level", &t_settings.sea_level, 0.0f, 5.0f)) {
-		water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
 	}
 
 	ImGui::Text("Texturing settings");
@@ -145,9 +141,16 @@ void BaseTerrain::renderUI() {
 	ImGui::SliderFloat("Max Grass Slope", &t_settings.max_grass_slope, 0.0f, 1.0f);
 
 	if (water_plane) {
-		ImGui::Text("Test water settings");
+		ImGui::Text("Water settings");
+		if (ImGui::SliderFloat("Sea Level", &t_settings.sea_level, 0.0f, 5.0f)) {
+			water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
+		}
+		if (ImGui::DragFloat("Sea size scalar", &water_plane->size_scalar, 0.01f, 2.5f)) {
+			water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
+		}
+		ImGui::DragFloat("Wave Speed", &water_plane->wave_speed, 0.0001f, 0.001f, 0.5f, "%.5f");
 		ImGui::SliderFloat("Water metallicness", &water_plane->metallic, 0.0f, 1.0f);
-		ImGui::SliderFloat("Water smoothness", &water_plane->smoothness, 0.0f, 1.0f);
+		ImGui::SliderFloat("Water smoothness (fps heavy)", &water_plane->smoothness, 0.0f, 1.0f);
 	}
 
 	ImGui::Separator();

@@ -226,6 +226,7 @@ void Noise::updateTexture(bool reuse_old) {
 void Noise::generateHeightmap(bool update_pixels) {
 	int index = 0;
 
+	float local_min = 1.0f;
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			float fx = static_cast<float>(x);
@@ -239,10 +240,12 @@ void Noise::generateHeightmap(bool update_pixels) {
 			float data = noise.GetNoise(fx, fy);
 			float normal = (data + 1.0f) / 2.0f;
 			normal = powf(normal, settings.noise_exp);
+			local_min = std::fminf(local_min, normal);
 			heightmap[index++] = normal;
 		}
 	}
 
+	min_height = local_min;
 	if (update_pixels) {
 		updatePixelsWithHeightmap();
 	}

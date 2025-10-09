@@ -18,6 +18,7 @@ namespace Terrain {
 		
 		int width = DEFAULT_WIDTH;
 		int height = DEFAULT_HEIGHT;
+		float min_height = 0.0f; // The minimum height level in the generated heightmap, used to normalize the heights to a base level
 		
 		FastNoiseLite noise;
 		FastNoiseLite domainWarp;
