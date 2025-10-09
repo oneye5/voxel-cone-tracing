@@ -119,7 +119,7 @@ void loadScene0() {
 	renderer->voxelizer->setCenter(glm::vec3(-5, 5, -5));
 	renderer->voxelizer->setWorldSize(50);
 	dirtyVoxels = true;
-	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.2);
+	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.1);
 }
 
 
@@ -128,7 +128,7 @@ void loadScene1() {
 	float roomSize = 2.0f;
 	float wallThickness = roomSize / 20.0f;
 	float wallLen = 0.55;
-	glm::vec3 roomMat = glm::vec3(0, 0.3, 0);
+	glm::vec3 roomMat = glm::vec3(0, 0.5, 0);
 
 	// Create renderables
 	light = new PointLightRenderable();
@@ -198,7 +198,7 @@ void loadScene1() {
 	renderer->voxelizer->setCenter(vec3(0, roomSize / 2, 0));
 	renderer->voxelizer->setWorldSize(15.25);
 	light->brightness = 1;
-	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.0);
+	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.02);
 	renderer->lightingPass->params.uZenithColor = glm::vec3(0);
 	renderer->lightingPass->params.uHorizonColor = glm::vec3(0, 0, 0.05);
 }

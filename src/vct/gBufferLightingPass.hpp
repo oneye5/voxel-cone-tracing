@@ -63,7 +63,7 @@ public:
 		params.uDiffuseBrightnessMultiplier = 20000.0;
 		params.uOccludeThresholdForSecondaryCone = 0.8; // TODO unused
 		params.uTransmittanceNeededForConeTermination = 0.01;
-		params.uAmbientColor = glm::vec3(0.2);
+		params.uAmbientColor = glm::vec3(0.1);
 		params.uSecondaryConeMaxStepMultiplier = 0.25; // TODO unused
 		params.uReflectionBlendLowerBound = 0.75;
 		params.uReflectionBlendUpperBound = 1;

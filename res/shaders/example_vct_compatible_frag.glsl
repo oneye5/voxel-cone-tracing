@@ -60,8 +60,8 @@ void main() {
     m.nrm = normal;
     m.alb = vec3(0.5,0.5,1.0);
     m.emi = vec3(0.0);		
-    m.mtl = 0.0;		// 0 for non-metalic surfaces
-    m.smoothness = 0.85;	// can be thought of as shinyness, eg concrete has a low value
+    m.mtl = 1.0;		// 0 for non-metalic surfaces
+    m.smoothness = 0.775;	// can be thought of as shinyness, eg concrete has a low value
     m.emiFac = 0.0;		// either 0 or >= 1
 
     writeRenderInfo(m);
