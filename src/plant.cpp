@@ -42,10 +42,16 @@ void Plant::recalculate_mesh() {
 	cgra::mesh_builder canopy_mb;
 	canopy_mb.mode = GL_LINES;
 
+	float step = 1;
 	static float angle = 0.3;
 	float size = 1;
 	mat4 trans = mat4(1);
-	std::vector<std::pair<mat4, float>> stack = {};
+	struct stackItem {
+		mat4 trans;
+		float size;
+		float step;
+	};
+	std::vector<stackItem> stack = {};
 	std::cout <<"Calculating for " << current << "\n";
 	for (const auto &c: current) {
 		switch (c) {
@@ -57,10 +63,11 @@ void Plant::recalculate_mesh() {
 
 				break;
 			case 'F': // Permanent growth
-				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
+				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {step,0,0}}));
 				trans = translate(trans, {0, size, 0});
-				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
+				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {step,0,0}}));
 				size *= 0.8;
+				step += 1;
 
 				break;
 			case '-': // Rot back Z
@@ -83,12 +90,13 @@ void Plant::recalculate_mesh() {
 				trans = rotate(trans, angle, {0,1,0});
 				break;
 			case '[': // Push matrix
-				stack.push_back({trans, size});
+				stack.push_back({trans, size, step});
 				break;
 			case ']': // Pop matrix
 				const auto &last = stack.back();
-				size = last.second;
-				trans = last.first;
+				size = last.size;
+				trans = last.trans;
+				step = last.step;
 				stack.pop_back();
 				break;
 		}
