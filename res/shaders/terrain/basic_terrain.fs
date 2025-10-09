@@ -51,7 +51,9 @@ uniform bool useFakedLighting; // whether to use faked lighting, just until prop
 uniform float min_rock_slope;
 uniform float max_grass_slope;
 
-const float TEX_BASE_SCALAR = 8.0f;
+uniform float tex_base_scalar;
+uniform float triplanar_sharpness; // Controls blend sharpness between projections
+uniform bool use_triplanar_mapping;
 
 void writeRenderInfo(MaterialData m) {
     if (uRenderMode == 0) { // voxel
@@ -127,6 +129,40 @@ vec3 getTerrainColor(vec2 uv, float height) {
 	return final_color;
 }
 
+vec3 triplanarSample(sampler2D tex, vec3 worldPos, vec3 normal) {
+	// Calculate blend weights based on normal
+	vec3 blendWeights = abs(normal);
+	blendWeights = pow(blendWeights, vec3(triplanar_sharpness));
+	blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z);
+
+	// Sample texture from each projection plane
+	vec3 xProjection = texture(tex, worldPos.zy).rgb;
+	vec3 yProjection = texture(tex, worldPos.xz).rgb;
+	vec3 zProjection = texture(tex, worldPos.xy).rgb;
+
+	// Blend the three projections
+	return xProjection * blendWeights.x +
+		yProjection * blendWeights.y +
+		zProjection * blendWeights.z;
+}
+
+// Get slope texture with triplanar mapping
+vec3 getTerrainColorSlopeTriplanar(vec3 worldPos, vec3 normal) {
+	vec3 grass_col = triplanarSample(grass_texture, worldPos, normal);
+	vec3 rock_col = triplanarSample(rock_texture, worldPos, normal);
+
+	float rock_grass_weight = normal.y;
+	
+	rock_grass_weight = max(min_rock_slope, rock_grass_weight);
+	rock_grass_weight = min(max_grass_slope, rock_grass_weight);
+	rock_grass_weight -= min_rock_slope;
+	rock_grass_weight /= max_grass_slope - min_rock_slope;
+
+	vec3 col = mix(rock_col, grass_col, rock_grass_weight);
+	return col;
+}
+
+// Get slope texture without triplanar mapping
 vec3 getTerrainColorSlope(vec2 uv, vec3 normal) {
 	vec3 grass_col = texture(grass_texture, uv).rgb;
 	vec3 rock_col = texture(rock_texture, uv).rgb;
@@ -147,9 +183,11 @@ void main() {
 	float height = texture(heightMap, f_in.textureCoord).r;
 	vec3 col;
 	if (useTexturing) {
-		//col = texture(sand_texture, f_in.textureCoord * TEX_BASE_SCALAR).rgb;
-		// col = getTerrainColor(f_in.textureCoord * TEX_BASE_SCALAR, height).xyz;
-		col = getTerrainColorSlope(f_in.textureCoord * TEX_BASE_SCALAR, f_in.normal);
+		//col = texture(sand_texture, f_in.textureCoord * tex_base_scalar).rgb;
+		// col = getTerrainColor(f_in.textureCoord * tex_base_scalar, height).xyz;
+		// col = getTerrainColorSlope(f_in.textureCoord * tex_base_scalar, f_in.normal);
+		col = (use_triplanar_mapping) ? getTerrainColorSlopeTriplanar(f_in.position, normalize(f_in.normal)) : getTerrainColorSlope(f_in.textureCoord * tex_base_scalar, f_in.normal);
+		// col = getTerrainColorSlopeTriplanar(f_in.position, normalize(f_in.normal));
 	} else {
 		col = vec3(height, height, height);
 	}

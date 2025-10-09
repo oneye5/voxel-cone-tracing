@@ -18,6 +18,10 @@ namespace Terrain {
 
 		float min_rock_slope = 0.95f; // The min slope for rock texturing (0-1)
 		float max_grass_slope = 1.0f; // The max slope for grass texturing (0-1)
+
+		bool use_triplanar_mapping = true;
+		float tex_base_scalar = 8.0f; // The scale to apply to the uv coordinates for texture mapping
+		float triplanar_sharpness = 4.0f; // Sharpness of the triplanar blending
 	};
 
 	struct PlaneTerrain {
