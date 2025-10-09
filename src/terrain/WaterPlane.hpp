@@ -20,12 +20,13 @@ namespace Terrain {
 		GLuint water_normal_texture = 0;
 		GLuint water_dudv_texture = 0;
 		glm::mat4 model_transform = glm::mat4(1.0f); // Water model matrix, has height translation applied
+		float size_scalar = 1.2; // scale to apply to the x and z components of the mesh, to make it extend past terrain
 
 		explicit WaterPlane(GLuint texid = 0);
 
 		void update_transform(glm::vec3 model_scale, float sea_level);
 
-		const float WAVE_SPEED = 0.001f;
+		float wave_speed = 0.0005f;
 
 		// For testing shader things
 		float metallic = 0.5f;

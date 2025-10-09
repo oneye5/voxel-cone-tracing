@@ -136,18 +136,21 @@ void BaseTerrain::renderUI() {
 		changePlaneSubdivision(plane_subs);
 	}
 
-	if (water_plane && ImGui::SliderFloat("Sea Level", &t_settings.sea_level, 0.0f, 5.0f)) {
-		water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
-	}
-
 	ImGui::Text("Texturing settings");
 	ImGui::SliderFloat("Min Rock Slope", &t_settings.min_rock_slope, 0.0f, t_settings.max_grass_slope-0.001f);
 	ImGui::SliderFloat("Max Grass Slope", &t_settings.max_grass_slope, 0.0f, 1.0f);
 
 	if (water_plane) {
-		ImGui::Text("Test water settings");
+		ImGui::Text("Water settings");
+		if (ImGui::SliderFloat("Sea Level", &t_settings.sea_level, 0.0f, 5.0f)) {
+			water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
+		}
+		if (ImGui::DragFloat("Sea size scalar", &water_plane->size_scalar, 0.01f, 2.5f)) {
+			water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
+		}
+		ImGui::DragFloat("Wave Speed", &water_plane->wave_speed, 0.0001f, 0.001f, 0.5f, "%.5f");
 		ImGui::SliderFloat("Water metallicness", &water_plane->metallic, 0.0f, 1.0f);
-		ImGui::SliderFloat("Water smoothness", &water_plane->smoothness, 0.0f, 1.0f);
+		ImGui::SliderFloat("Water smoothness (fps heavy)", &water_plane->smoothness, 0.0f, 1.0f);
 	}
 
 	ImGui::Separator();

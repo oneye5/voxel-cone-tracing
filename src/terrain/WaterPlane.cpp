@@ -40,8 +40,10 @@ WaterPlane::WaterPlane(GLuint texid) : plane_mesh(cgra::CREATE_PLANE(256, 256, 2
 }
 
 void WaterPlane::update_transform(glm::vec3 model_scale, float sea_level) {
-	mat4 m_scale = glm::scale(mat4(1.0f), model_scale);
-	vec3 trans = vec3(-2.0f - (model_scale.x / 2.0f), sea_level, -2.0f - (model_scale.z / 2.0f));
+	vec3 scale = vec3(model_scale.x * size_scalar, model_scale.y, model_scale.z * size_scalar);
+	mat4 m_scale = glm::scale(mat4(1.0f), scale);
+	float offset = -2.0f * size_scalar;
+	vec3 trans = vec3(offset - (scale.x / 2.0f), sea_level, offset - (scale.z / 2.0f));
 	mat4 m_trans = glm::translate(mat4(1.0f), trans);
 
 	model_transform = m_trans * m_scale;
@@ -70,7 +72,7 @@ void WaterPlane::draw() {
 
 	glUniform1f(glGetUniformLocation(shader, "metallic"), metallic);
 	glUniform1f(glGetUniformLocation(shader, "smoothness"), smoothness);
-	move_factor += WAVE_SPEED;
+	move_factor += wave_speed;
 	move_factor = fmodf(move_factor, 1.0f);
 	glUniform1f(glGetUniformLocation(shader, "move_factor"), move_factor);
 
