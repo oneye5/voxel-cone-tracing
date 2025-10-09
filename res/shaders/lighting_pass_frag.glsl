@@ -31,6 +31,7 @@ uniform vec3 uHorizonColor;
 uniform vec3 uZenithColor;
 uniform bool uToneMapEnable;
 uniform float uReflectionAperture;
+uniform float uConeOffset;
 
 const float PI = 3.14159265359;
 #define APERTURE_SCALE 1.0
@@ -260,7 +261,7 @@ void main() {
     float NdotV = max(dot(worldNormal, viewDir), 0.0);
     vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kD = (1.0 - F) * (1.0 - metallic);
-    vec3 traceOrigin = worldPos + worldNormal * VOXEL_SIZE * 2.0;
+    vec3 traceOrigin = worldPos + worldNormal * VOXEL_SIZE * uConeOffset;
 
     // calculate indirect lighting
     vec4 indirectDiffuseResult = indirectDiffuseLight(traceOrigin, worldNormal);

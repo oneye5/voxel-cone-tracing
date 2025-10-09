@@ -31,6 +31,7 @@ public:
 		glm::vec3 uZenithColor;
 		bool uToneMapEnable;
 		float uReflectionAperture;
+		float uConeOffset;
 	};
 	light_pass_params params;
 
@@ -71,6 +72,7 @@ public:
 		params.uZenithColor = glm::vec3(0.2, 0.4, 0.8);
 		params.uToneMapEnable = true;
 		params.uReflectionAperture = 0.05;
+		params.uConeOffset = 3;
 	}
 
 	~gBufferLightingPass() {
@@ -114,7 +116,7 @@ public:
 		glUniform3fv(glGetUniformLocation(shader, "uZenithColor"), 1, value_ptr(params.uZenithColor));
 		glUniform1i(glGetUniformLocation(shader, "uToneMapEnable"), params.uToneMapEnable);
 		glUniform1f(glGetUniformLocation(shader, "uReflectionAperture"), params.uReflectionAperture);
-
+		glUniform1f(glGetUniformLocation(shader, "uConeOffset"), params.uConeOffset);
 
 
 		auto invView = glm::inverse(view);

@@ -119,7 +119,7 @@ void loadScene0() {
 	renderer->voxelizer->setCenter(glm::vec3(-5, 5, -5));
 	renderer->voxelizer->setWorldSize(50);
 	dirtyVoxels = true;
-	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.1);
+	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.05);
 }
 
 
@@ -292,69 +292,76 @@ void Application::renderGUI() {
 
 	// display current camera parameters
 	ImGui::Text("Application %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::SliderFloat("Pitch", &m_pitch, -pi<float>() / 2, pi<float>() / 2, "%.2f");
-	ImGui::SliderFloat("Yaw", &m_yaw, -pi<float>(), pi<float>(), "%.2f");
-	ImGui::DragFloat3("Camera Position", &m_cameraPosition[0], 0.1f);
 	ImGui::Separator();
 
-	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
-	if (ImGui::SliderFloat3("Light scale", &lightScale[0], 0, 4)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
-	ImGui::SliderFloat3("Light color", &light->lightColor[0], 0, 1);
-	ImGui::SliderFloat("Light brightness", &light->brightness, 1, 100000);
-
-	ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
-	ImGui::SliderFloat3("Zenith color", &renderer->lightingPass->params.uZenithColor[0], 0, 1);
-
-	//if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
-	ImGui::Separator();
+	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
 	if (ImGui::Button("load scene 0")) { loadScene0(); }
 	if (ImGui::Button("load scene 1")) { loadScene1(); }
 	if (ImGui::Button("load scene 2")) { loadScene2(); }
 
+	ImGui::Separator();
+	if (ImGui::CollapsingHeader("Light settings", ImDrawFlags_Closed)) {
+		if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
+		if (ImGui::SliderFloat3("Light scale", &lightScale[0], 0, 4)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
+		ImGui::SliderFloat3("Light color", &light->lightColor[0], 0, 1);
+		ImGui::SliderFloat("Light brightness", &light->brightness, 1, 100000);
+		ImGui::SliderFloat3("Ambient RGB", &renderer->lightingPass->params.uAmbientColor[0], 0.0, 1);
+		ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 100000);
+		ImGui::SliderFloat("Reflection cone aperature", &renderer->lightingPass->params.uReflectionAperture, 0, 1);
+	}
+	if (ImGui::CollapsingHeader("Sky settings", ImDrawFlags_Closed)) {
+		ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
+		ImGui::SliderFloat3("Zenith color", &renderer->lightingPass->params.uZenithColor[0], 0, 1);
+	}
+
+	
 #pragma region renderer params
 	ImGui::Separator();
 	ImGui::Text("Renderer params:");
-	if (ImGui::Button("Re-voxelize")) { dirtyVoxels = true; }
-	ImGui::Checkbox("Filmic tone mapping", &renderer->lightingPass->params.uToneMapEnable);
-	ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
-	ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.05, 2);
-	ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 1024);
-	ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
-	ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
-	ImGui::SliderFloat3("Ambient RGB", &renderer->lightingPass->params.uAmbientColor[0], 0.0, 1);
-	ImGui::SliderFloat("Reflection blend lower bound", &renderer->lightingPass->params.uReflectionBlendLowerBound, 0, 1);
-	ImGui::SliderFloat("Reflection blend upper bound", &renderer->lightingPass->params.uReflectionBlendUpperBound, 0, 1);
-	ImGui::SliderFloat("Diffuse brightness multiplier", &renderer->lightingPass->params.uDiffuseBrightnessMultiplier, 0, 100000);
-	ImGui::SliderFloat("Reflection cone aperature", &renderer->lightingPass->params.uReflectionAperture, 0, 1);
-
-
-	ImGui::Separator();
-	ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
-	ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
-	ImGui::SliderFloat("Voxel world size", &renderer->voxelizer->m_params.worldSize, 1, 100);
-	ImGui::SliderFloat("Voxel world center X", &renderer->voxelizer->m_params.center.x, -50, 50);
-	ImGui::SliderFloat("Voxel world center Y", &renderer->voxelizer->m_params.center.y, -50, 50);
-	ImGui::SliderFloat("Voxel world center Z", &renderer->voxelizer->m_params.center.z, -50, 50);
-	if (ImGui::Button("Voxel show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
-	if (ImGui::Button("Voxel show metallic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
-	if (ImGui::Button("Voxel show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
-	if (ImGui::Button("Voxel show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
-	if (ImGui::Button("Voxel show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
-	if (ImGui::Button("Voxel show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
+	if (ImGui::CollapsingHeader("Cone settings", ImDrawFlags_Closed)) {
+		ImGui::Checkbox("Filmic tone mapping", &renderer->lightingPass->params.uToneMapEnable);
+		ImGui::SliderFloat("Cone Aperature", &renderer->lightingPass->params.uConeAperture, 0.01, 2);
+		ImGui::SliderFloat("Cone step multiplier", &renderer->lightingPass->params.uStepMultiplier, 0.05, 2);
+		ImGui::SliderInt("Number of diffuse cones", &renderer->lightingPass->params.uNumDiffuseCones, 0, 128);
+		ImGui::SliderFloat("Transmittance needed for cone termination", &renderer->lightingPass->params.uTransmittanceNeededForConeTermination, 0.0, 1);
+		ImGui::SliderFloat("Cone offset", &renderer->lightingPass->params.uConeOffset, 0.0, 10);
+		ImGui::SliderFloat("Reflection cone aperature", &renderer->lightingPass->params.uReflectionAperture, 0, 1);
+		ImGui::SliderFloat("Cone max steps", &renderer->lightingPass->params.uMaxSteps, 0, 1024);
+	}
+	if (ImGui::CollapsingHeader("Reflection blending settings", ImDrawFlags_Closed)) {
+		ImGui::SliderFloat("Reflection blend lower bound", &renderer->lightingPass->params.uReflectionBlendLowerBound, 0, 1);
+		ImGui::SliderFloat("Reflection blend upper bound", &renderer->lightingPass->params.uReflectionBlendUpperBound, 0, 1);
+	}
 
 	ImGui::Separator();
-	ImGui::Checkbox("Gbuffer debug enable", &renderer->debug_params.gbuffer_debug_mode_on);
-	if (ImGui::Button("Gbuffer show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
-	if (ImGui::Button("Gbuffer show metalic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
-	if (ImGui::Button("Gbuffer show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
-	if (ImGui::Button("Gbuffer show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
-	if (ImGui::Button("Gbuffer show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
-	if (ImGui::Button("Gbuffer show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
-	if (ImGui::Button("Gbuffer show emissive colorf as RGB")) { renderer->debug_params.debug_channel_index = 7; }
-	if (ImGui::Button("Gbuffer show 'spare channel' as RGB")) { renderer->debug_params.debug_channel_index = 8; }
-	if (ImGui::Button("Gbuffer show voxel sampled position as RGB")) { renderer->debug_params.debug_channel_index = 9; }
-#pragma endregion
+	if (ImGui::CollapsingHeader("Gbuffer debug mode", ImDrawFlags_Closed)) {
+		ImGui::Checkbox("Gbuffer debug enable", &renderer->debug_params.gbuffer_debug_mode_on);
+		if (ImGui::Button("Gbuffer show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
+		if (ImGui::Button("Gbuffer show metalic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
+		if (ImGui::Button("Gbuffer show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
+		if (ImGui::Button("Gbuffer show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
+		if (ImGui::Button("Gbuffer show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
+		if (ImGui::Button("Gbuffer show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
+		if (ImGui::Button("Gbuffer show emissive colorf as RGB")) { renderer->debug_params.debug_channel_index = 7; }
+		if (ImGui::Button("Gbuffer show 'spare channel' as RGB")) { renderer->debug_params.debug_channel_index = 8; }
+		if (ImGui::Button("Gbuffer show voxel sampled position as RGB")) { renderer->debug_params.debug_channel_index = 9; }
+	}
 
+	ImGui::Separator();
+	if (ImGui::CollapsingHeader("Voxel debug mode", ImDrawFlags_Closed)) {
+		ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
+		ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
+		ImGui::SliderFloat("Voxel world size", &renderer->voxelizer->m_params.worldSize, 1, 100);
+		ImGui::SliderFloat("Voxel world center X", &renderer->voxelizer->m_params.center.x, -50, 50);
+		ImGui::SliderFloat("Voxel world center Y", &renderer->voxelizer->m_params.center.y, -50, 50);
+		ImGui::SliderFloat("Voxel world center Z", &renderer->voxelizer->m_params.center.z, -50, 50);
+		if (ImGui::Button("Voxel show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }
+		if (ImGui::Button("Voxel show metallic as RGB")) { renderer->debug_params.debug_channel_index = 2; }
+		if (ImGui::Button("Voxel show normal as RGB")) { renderer->debug_params.debug_channel_index = 3; }
+		if (ImGui::Button("Voxel show smoothness as RGB")) { renderer->debug_params.debug_channel_index = 4; }
+		if (ImGui::Button("Voxel show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
+		if (ImGui::Button("Voxel show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
+	}
 	ImGui::End();
 
 	// Terrain UI stuff
