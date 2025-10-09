@@ -30,12 +30,13 @@ uniform float uReflectionBlendUpperBound;
 uniform vec3 uHorizonColor;
 uniform vec3 uZenithColor;
 uniform bool uToneMapEnable;
+uniform float uReflectionAperture;
 
 const float PI = 3.14159265359;
 #define APERTURE_SCALE 1.0
 #define REFLECTION_RANDOM_STR 0.05
 /*
-    FEATURES:
+    FEATURES:                                                                                                                                                                                                                       
     Emissive based specular for rough materials, geometry based reflections for smooth, with smooth blending between the two
 
     Monte carlo diffuse GI, using cosine weighted hemisphere sampling
@@ -152,7 +153,7 @@ vec4 traceCone(vec3 origin, vec3 direction, float aperture, bool stopAtFirstHit)
 }
 
 vec3 getSkyColor(vec3 viewDir) {
-    float t = smoothstep(0.0, 1.0, viewDir.y);
+    float t = smoothstep(0.0, 0.8, viewDir.y);
     return mix(uHorizonColor, uZenithColor, t);
 }
 
@@ -274,7 +275,7 @@ void main() {
     vec3 indirectGeometryResult = vec3(0);
     vec3 indirectSpecularResult = traceCone(traceOrigin, reflectDir, specularAperture, false).xyz;
     if (smoothness >= uReflectionBlendLowerBound) // optimization for when the result is not used
-        indirectGeometryResult = traceConeAgainstGeometry(traceOrigin, reflectDir, 0.05 + fastRand(traceOrigin.x + traceOrigin.y + traceOrigin.z) * REFLECTION_RANDOM_STR).xyz; // randomness to avoid blocky reflections
+        indirectGeometryResult = traceConeAgainstGeometry(traceOrigin, reflectDir, uReflectionAperture + fastRand(traceOrigin.x + traceOrigin.y + traceOrigin.z) * REFLECTION_RANDOM_STR).xyz; // randomness to avoid blocky reflections
     float blendFactor = smoothstep(uReflectionBlendLowerBound, uReflectionBlendUpperBound, smoothness);
     vec3 indirectSpecular = mix(indirectSpecularResult.rgb, indirectGeometryResult.rgb * 1.5, blendFactor); // blends between specular highlight and reflection, bit of a hack
 

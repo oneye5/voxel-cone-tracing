@@ -30,6 +30,7 @@ public:
 		glm::vec3 uHorizonColor;
 		glm::vec3 uZenithColor;
 		bool uToneMapEnable;
+		float uReflectionAperture;
 	};
 	light_pass_params params;
 
@@ -65,6 +66,7 @@ public:
 		params.uHorizonColor = glm::vec3(0.5, 0.8, 0.9);
 		params.uZenithColor = glm::vec3(0.2, 0.4, 0.8);
 		params.uToneMapEnable = true;
+		params.uReflectionAperture = 0.05;
 	}
 
 	~gBufferLightingPass() {
@@ -107,6 +109,8 @@ public:
 		glUniform3fv(glGetUniformLocation(shader, "uHorizonColor"), 1, value_ptr(params.uHorizonColor));
 		glUniform3fv(glGetUniformLocation(shader, "uZenithColor"), 1, value_ptr(params.uZenithColor));
 		glUniform1i(glGetUniformLocation(shader, "uToneMapEnable"), params.uToneMapEnable);
+		glUniform1f(glGetUniformLocation(shader, "uReflectionAperture"), params.uReflectionAperture);
+
 
 
 		auto invView = glm::inverse(view);
