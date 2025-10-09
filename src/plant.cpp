@@ -90,7 +90,7 @@ void Plant::recalculate_mesh() {
 	canopy.mesh = canopy_mb.build();
 }
 
-std::vector<Plant> create_plants(std::vector<create_plants_input> inputs) {
+std::vector<Plant> plant::create_plants(std::vector<create_plants_input> inputs) {
 	std::vector<Plant> ret;
 
 	for (auto pt : inputs) {
