@@ -75,7 +75,7 @@ void loadScene0() {
 
 	// Initialise plant data
 	plant::known_plants.tree.seed = "A";
-	plant::known_plants.tree.rules = { {'A', "F[+A][-A]"} };
+	plant::known_plants.tree.rules = { {'A', "F[&[+A][--A]]???[^[+A][--A]]"} };
 	{
 		cgra::shader_builder sb;
 		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));

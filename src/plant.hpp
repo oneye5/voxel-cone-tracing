@@ -42,7 +42,7 @@ namespace plant {
 		Mesh canopy;
 
 		Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps = 0);
-		Plant(PlantData data, int steps = 10);
+		Plant(PlantData data, int steps = 4);
 		void grow(int steps = 1);
 	};
 
