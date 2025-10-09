@@ -13,13 +13,21 @@ using namespace glm;
 
 KnownPlants plant::known_plants;
 
-Plant::Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps)
-	: trunk{trunk_shader}, canopy{canopy_shader}, ruleset{ruleset}, seed{seed}, current{seed} {
+Plant::Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps) :
+	ruleset{ruleset},
+	seed{seed},
+	current{seed},
+	trunk{trunk_shader},
+	canopy{canopy_shader} {
 	grow(steps);
 }
 
-Plant::Plant(PlantData data, int steps)
-	: trunk{data.trunk_shader}, canopy{data.canopy_shader}, ruleset{data.rules}, seed{data.seed}, current{seed} {
+Plant::Plant(PlantData data, int steps) :
+		ruleset{data.rules},
+		seed{data.seed},
+		current{seed},
+		trunk{data.trunk_shader},
+		canopy{data.canopy_shader} {
 	grow(steps);
 }
 
