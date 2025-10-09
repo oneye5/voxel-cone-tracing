@@ -18,50 +18,53 @@
 #include <example_renderable.cpp>
 #include <point_light_renderable.cpp>
 
-#include "opengl.hpp"
-#include "terrain/BaseTerrain.hpp"
-#include "terrain/WaterPlane.hpp"
-
 #include "lsystem.hpp"
 #include "plant.hpp"
+
+#include "terrain/BaseTerrain.hpp"
+#include "terrain/WaterPlane.hpp"
+#include <cubeRenderable.cpp>
+
 
 using namespace std;
 using namespace cgra;
 using namespace glm;
 
+glm::vec3 lightPos;
+glm::vec3 lightScale;
+bool dirtyVoxels = true;
 Renderer* renderer = nullptr;
 
-PointLightRenderable* light = nullptr;
+// scene 0, (this is ugly but it works)
 Terrain::BaseTerrain* t_terrain = nullptr;
-vector<plant::Plant> plants;
 ExampleRenderable* exampleRenderable = nullptr;
 ExampleRenderable* exampleRenderable2 = nullptr;
 Terrain::WaterPlane* t_water = nullptr;
 
-glm::vec3 lightPos;
-glm::vec3 lightScale;
+// scene 1
+CubeRenderable* floor1 = nullptr;
+CubeRenderable* ceiling = nullptr;
+CubeRenderable* backWall = nullptr;
+CubeRenderable* leftWall = nullptr;
+CubeRenderable* rightWall = nullptr;
+CubeRenderable* cube = nullptr;
+vector<plant::Plant> plants;
+ExampleRenderable* exampleRenderable3 = nullptr;
 
-Application::Application(GLFWwindow* window) : m_window(window) {
-	int width, height;
-	glfwGetFramebufferSize(m_window, &width, &height);
-	renderer = new Renderer(width, height);
+// shared
+PointLightRenderable* light = nullptr;
 
-	// Initialise plant data
-	plant::known_plants.tree.seed = "A";
-	plant::known_plants.tree.rules = {{'A', "F[+A][-A]"}};
-	{
-		cgra::shader_builder sb;
-		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));
-		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_frag.glsl"));
-		plant::known_plants.tree.trunk_shader  = sb.build();
-	}
-	{
-		cgra::shader_builder sb;
-		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_vert.glsl"));
-		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_frag.glsl"));
-		plant::known_plants.tree.canopy_shader  = sb.build();
-	}
-	//---
+void resetScene() {
+	//for (int i = 0; i < renderer->renderables.size(); i++)   
+		//delete renderer->renderables.at(i);
+	// keep stuff in memory, otherwise things break, this is bad and ugly and terrible but thats okay...
+	renderer->renderables.clear();
+	dirtyVoxels = true;
+	renderer->lightingPass->setDefaultParams();
+}
+
+void loadScene0() {
+	resetScene();
 
 	t_terrain = new Terrain::BaseTerrain();
 	t_water = new Terrain::WaterPlane();
@@ -70,10 +73,27 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	exampleRenderable = new ExampleRenderable();
 	exampleRenderable2 = new ExampleRenderable();
 
+	// Initialise plant data
+	plant::known_plants.tree.seed = "A";
+	plant::known_plants.tree.rules = { {'A', "F[+A][-A]"} };
+	{
+		cgra::shader_builder sb;
+		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));
+		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_frag.glsl"));
+		plant::known_plants.tree.trunk_shader = sb.build();
+	}
+	{
+		cgra::shader_builder sb;
+		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_vert.glsl"));
+		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_frag.glsl"));
+		plant::known_plants.tree.canopy_shader = sb.build();
+	}
+	//---
+
 	// modifactions
 	lightPos = glm::vec3(-0, 10, -0);
-	lightScale = glm::vec3(2,0.5,2);
-	light->modelTransform = glm::translate(glm::mat4(1), lightPos); 
+	lightScale = glm::vec3(2, 0.5, 2);
+	light->modelTransform = glm::translate(glm::mat4(1), lightPos);
 	light->modelTransform = glm::scale(light->modelTransform, lightScale);
 	exampleRenderable->modelTransform = glm::translate(glm::mat4(1), glm::vec3(0.5, 4, 0.5));
 	exampleRenderable->modelTransform = glm::scale(exampleRenderable->modelTransform, vec3(0.3));
@@ -85,11 +105,11 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	renderer->addRenderable(t_terrain);
 	renderer->addRenderable(t_water);
 	renderer->addRenderable(light);
-	renderer->addRenderable(exampleRenderable);
+	//renderer->addRenderable(exampleRenderable);
 	//renderer->addRenderable(exampleRenderable2);
 
 	// Create some debug plants
-	plants = plant::create_plants({{{0,4,0}}});
+	plants = plant::create_plants({ {{0,4,0}} });
 	for (auto& p : plants) {
 		renderer->addRenderable(&p.trunk);
 		renderer->addRenderable(&p.canopy);
@@ -98,9 +118,102 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 	// renderer tweaks based on scene size
 	renderer->voxelizer->setCenter(glm::vec3(-5, 5, -5));
 	renderer->voxelizer->setWorldSize(50);
+	dirtyVoxels = true;
+	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.2);
 }
 
-bool dirtyVoxels = true;
+
+void loadScene1() {
+	resetScene();
+	float roomSize = 2.0f;
+	float wallThickness = roomSize / 20.0f;
+	float wallLen = 0.55;
+	glm::vec3 roomMat = glm::vec3(0, 0.3, 0);
+
+	// Create renderables
+	light = new PointLightRenderable();
+	floor1 = new CubeRenderable();
+	ceiling = new CubeRenderable();
+	backWall = new CubeRenderable();
+	leftWall = new CubeRenderable();
+	rightWall = new CubeRenderable();
+	cube = new CubeRenderable();
+	exampleRenderable3 = new ExampleRenderable();
+
+	// Floor (white)
+	floor1->color = vec3(1.0f, 1.0f, 1.0f);
+	floor1->mat = roomMat;
+	floor1->modelTransform = glm::translate(mat4(1), vec3(0, 0, 0));
+	floor1->modelTransform = glm::scale(floor1->modelTransform, vec3(roomSize * wallLen, wallThickness, roomSize * wallLen));
+
+	// Ceiling (white)
+	ceiling->color = vec3(1.0f, 1.0f, 1.0f);
+	ceiling->mat = roomMat;
+	ceiling->modelTransform = glm::translate(mat4(1), vec3(0, roomSize, 0));
+	ceiling->modelTransform = glm::scale(ceiling->modelTransform, vec3(roomSize * wallLen, wallThickness, roomSize * wallLen));
+
+	// Back wall (white)
+	backWall->color = vec3(1.0f, 1.0f, 1.0f);
+	backWall->mat = roomMat;
+	backWall->modelTransform = glm::translate(mat4(1), vec3(0, roomSize / 2, -roomSize / 2));
+	backWall->modelTransform = glm::scale(backWall->modelTransform, vec3(roomSize * wallLen, roomSize * wallLen, wallThickness));
+
+	// Left wall (red)
+	leftWall->color = vec3(1.0f, 0.0f, 0.0f);
+	leftWall->mat = roomMat;
+	leftWall->modelTransform = glm::translate(mat4(1), vec3(-roomSize / 2, roomSize / 2, 0));
+	leftWall->modelTransform = glm::scale(leftWall->modelTransform, vec3(wallThickness, roomSize * wallLen, roomSize * wallLen));
+
+	// Right wall (green)
+	rightWall->color = vec3(0.0f, 1.0f, 0.0f);
+	rightWall->mat = roomMat;
+	rightWall->modelTransform = glm::translate(mat4(1), vec3(roomSize / 2, roomSize / 2, 0));
+	rightWall->modelTransform = glm::scale(rightWall->modelTransform, vec3(wallThickness, roomSize * wallLen, roomSize * wallLen));
+
+	// Light source (area light above center)
+	lightPos = vec3(0, roomSize * 0.9, 0);
+	lightScale = vec3(roomSize / 10, roomSize / 10, roomSize / 10);
+	light->modelTransform = glm::translate(mat4(1), lightPos);
+	light->modelTransform = glm::scale(light->modelTransform, lightScale);
+
+	cube->color = vec3(1.0f, 1.0f, 1.0f);
+	cube->mat = roomMat;
+	cube->modelTransform = glm::translate(mat4(1), vec3(-roomSize / 8, roomSize / 6, 0));
+	cube->modelTransform = glm::scale(cube->modelTransform, vec3(roomSize / 14, roomSize / 3, roomSize / 7));
+
+	exampleRenderable3->modelTransform = glm::translate(glm::mat4(1), glm::vec3(roomSize / 5, roomSize / 2, roomSize / 5));
+	exampleRenderable3->modelTransform = glm::scale(exampleRenderable3->modelTransform, vec3(roomSize / 15));
+
+	// Add to renderer
+	renderer->addRenderable(floor1);
+	renderer->addRenderable(ceiling);
+	renderer->addRenderable(backWall);
+	renderer->addRenderable(leftWall);
+	renderer->addRenderable(rightWall);
+	renderer->addRenderable(light);
+	renderer->addRenderable(cube);
+	renderer->addRenderable(exampleRenderable3);
+
+	// Configure voxelizer
+	renderer->voxelizer->setCenter(vec3(0, roomSize / 2, 0));
+	renderer->voxelizer->setWorldSize(15.25);
+	light->brightness = 1;
+	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.0);
+	renderer->lightingPass->params.uZenithColor = glm::vec3(0);
+	renderer->lightingPass->params.uHorizonColor = glm::vec3(0, 0, 0.05);
+}
+
+void loadScene2() {
+
+}
+
+Application::Application(GLFWwindow* window) : m_window(window) {
+	int width, height;
+	glfwGetFramebufferSize(m_window, &width, &height);
+	renderer = new Renderer(width, height);
+
+	loadScene0();
+}
 
 void Application::updateCameraMovement(float deltaTime) {
 	// Calculate forward and right directions
@@ -157,6 +270,7 @@ void Application::render() {
 		* rotate(mat4(1), m_yaw, vec3(0, 1, 0))
 		* translate(mat4(1), -m_cameraPosition);
 
+
 	if (dirtyVoxels) {
 		renderer->refreshVoxels(view, proj);
 		dirtyVoxels = false;
@@ -183,15 +297,19 @@ void Application::renderGUI() {
 	ImGui::DragFloat3("Camera Position", &m_cameraPosition[0], 0.1f);
 	ImGui::Separator();
 
-	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale));}
+	if (ImGui::SliderFloat3("Light pos", &lightPos[0], -20, 20)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
 	if (ImGui::SliderFloat3("Light scale", &lightScale[0], 0, 4)) { light->modelTransform = glm::translate(glm::mat4(1), lightPos); light->modelTransform = glm::scale(light->modelTransform, vec3(lightScale)); }
-	ImGui::SliderFloat3("Light color", &light->lightColor[0], 0,1);
+	ImGui::SliderFloat3("Light color", &light->lightColor[0], 0, 1);
 	ImGui::SliderFloat("Light brightness", &light->brightness, 1, 100000);
 
 	ImGui::SliderFloat3("Horizon color", &renderer->lightingPass->params.uHorizonColor[0], 0, 1);
 	ImGui::SliderFloat3("Zenith color", &renderer->lightingPass->params.uZenithColor[0], 0, 1);
 
 	//if (ImGui::Button("Screenshot")) rgba_image::screenshot(true);
+	ImGui::Separator();
+	if (ImGui::Button("load scene 0")) { loadScene0(); }
+	if (ImGui::Button("load scene 1")) { loadScene1(); }
+	if (ImGui::Button("load scene 2")) { loadScene2(); }
 
 #pragma region renderer params
 	ImGui::Separator();
@@ -224,7 +342,6 @@ void Application::renderGUI() {
 	if (ImGui::Button("Voxel show albedo as RGB")) { renderer->debug_params.debug_channel_index = 5; }
 	if (ImGui::Button("Voxel show emissive factor as RGB")) { renderer->debug_params.debug_channel_index = 6; }
 
-	// finish creating window
 	ImGui::Separator();
 	ImGui::Checkbox("Gbuffer debug enable", &renderer->debug_params.gbuffer_debug_mode_on);
 	if (ImGui::Button("Gbuffer show position as RGB")) { renderer->debug_params.debug_channel_index = 1; }

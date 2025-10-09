@@ -50,6 +50,10 @@ public:
 		glUniform1i(glGetUniformLocation(shader, "voxelTex1"), 5);
 		glUniform1i(glGetUniformLocation(shader, "voxelTex2"), 6);
 
+		setDefaultParams();
+	}
+
+	void setDefaultParams() {
 		// set default params
 		params.uConeAperture = 1.0;
 		params.uStepMultiplier = 0.6;
