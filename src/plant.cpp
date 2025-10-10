@@ -63,7 +63,7 @@ void Plant::recalculate_mesh() {
 					trans = translate(trans, {0, size/2.0, 0});
 					vec4 b = trans * vec4{0,0,0,1};
 					vec4 norm = normalize(b-a);
-					canopy_mb.push_index(canopy_mb.push_vertex({trans * vec4{0,0,0,1}, vec3{norm}}));
+					canopy_mb.push_index(canopy_mb.push_vertex({a, vec3{norm}}));
 					// canopy_mb.push_index(canopy_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
 					size *= 0.8;
 				}
