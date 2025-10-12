@@ -124,6 +124,8 @@ void loadScene0() {
 	renderer->voxelizer->setWorldSize(50);
 	dirtyVoxels = true;
 	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.05);
+	renderer->lightingPass->params.uDiffuseBrightnessMultiplier = 2500;
+
 }
 
 
@@ -204,7 +206,7 @@ void loadScene1() {
 	light->brightness = 1;
 	renderer->lightingPass->params.uAmbientColor = glm::vec3(0.02);
 	renderer->lightingPass->params.uStepMultiplier = 1.5;
-	renderer->lightingPass->params.uDiffuseBrightnessMultiplier = 100000;
+	renderer->lightingPass->params.uDiffuseBrightnessMultiplier = 1500;
 	renderer->lightingPass->params.uZenithColor = glm::vec3(0);
 	renderer->lightingPass->params.uHorizonColor = glm::vec3(0, 0, 0.01);
 }
@@ -359,7 +361,11 @@ void Application::renderGUI() {
 	}
 
 	ImGui::Separator();
-	if (ImGui::CollapsingHeader("Voxel debug mode", ImDrawFlags_Closed)) {
+	if (ImGui::CollapsingHeader("Voxel settings", ImDrawFlags_Closed)) {
+		ImGui::Checkbox("Voxel conservative rasterization", &renderer->voxelizer->m_params.conservativeRaster);
+		ImGui::SliderInt("Voxelization render resolution", &renderer->voxelizer->m_params.voxelizeRes, 64, 7680);
+		ImGui::SliderInt("Voxel splat radius", &renderer->voxelizer->m_params.voxelSplatRadius, 0, 5);
+
 		ImGui::Checkbox("Voxel debug enable", &renderer->debug_params.voxel_debug_mode_on);
 		ImGui::SliderFloat("Voxel slice", &renderer->debug_params.voxel_slice, 0, 1);
 		ImGui::SliderFloat("Voxel world size", &renderer->voxelizer->m_params.worldSize, 1, 100);

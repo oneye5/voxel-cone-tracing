@@ -14,6 +14,9 @@ public:
         float worldSize = 30.0f;
         glm::vec3 center = glm::vec3(0.0f);
         int mipLevels = 0;
+        int voxelizeRes = 1024;
+        bool conservativeRaster = false;
+        int voxelSplatRadius = 1;
     };
 
     Voxelizer(int resolution = 512);
@@ -46,7 +49,7 @@ private:
 
     // Helper methods
     glm::mat4 createOrthographicProjection() const;
-    std::array<glm::mat4, 3> createOrthographicViews() const;
+    std::array<glm::mat4, 6> createOrthographicViews() const;
 private:
     GLuint m_voxelShader;
     GLuint m_debugShader;

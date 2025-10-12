@@ -76,7 +76,7 @@ public:
 		params.uReflectionAperture = 0.05;
 		params.uConeOffset = 3;
 		params.uAO = 0.5;
-		params.uContrast = 0.8;
+		params.uContrast = 0.9;
 	}
 
 	~gBufferLightingPass() {

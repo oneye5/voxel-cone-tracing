@@ -7,7 +7,6 @@ using namespace glm;
 using namespace cgra;
 
 #define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
-#define VOXELIZE_RES 512
 #define VOXEL_IMAGE_TYPE GL_RGBA16F
 
 Voxelizer::Voxelizer(int resolution)
@@ -139,8 +138,11 @@ void Voxelizer::voxelize(std::function<void()> drawMainGeometry, std::vector<glm
     if (!m_initialized) {
         std::cerr << "Voxelizer not properly initialized!" << std::endl;
         return;
-    }
-    //glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
+    } 
+
+    if(m_params.conservativeRaster)
+        glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
+
     clearVoxelTexture();
 
     // Store current viewport
@@ -181,7 +183,7 @@ void Voxelizer::clearVoxelTexture() {
 void Voxelizer::setupVoxelizationState() {
 
     // Use higher resolution viewport for better fragment coverage
-    glViewport(0, 0, VOXELIZE_RES, VOXELIZE_RES);
+    glViewport(0, 0, m_params.voxelizeRes, m_params.voxelizeRes);
 
     // Bind voxel texture for writing
     glBindImageTexture(0, m_voxelTex0, 0, GL_TRUE, 0, GL_WRITE_ONLY, VOXEL_IMAGE_TYPE);
@@ -199,20 +201,17 @@ void Voxelizer::restoreRenderingState(int width, int height) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, width, height);
-   // glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
-
+    glDisable(GL_CONSERVATIVE_RASTERIZATION_NV);
 }
 
 void Voxelizer::performVoxelization(std::function<void()> drawMainGeometry, std::vector<glm::mat4> modelTransforms, std::vector<GLuint> usingShaders) {
     mat4 orthoProj = createOrthographicProjection();
     auto views = createOrthographicViews();
 
-    // Multiple passes with sub-pixel jitter
     const int numSamples = 4;
     const float jitterAmount = 0.5f / float(m_params.resolution);
 
     for (int sample = 0; sample < numSamples; sample++) {
-        // Calculate jitter offset
         float jitterX = ((sample % 2) - 0.5f) * jitterAmount;
         float jitterY = ((sample / 2) - 0.5f) * jitterAmount;
         mat4 jitterProj = translate(mat4(1.0f), vec3(jitterX, jitterY, 0.0f)) * orthoProj;
@@ -228,9 +227,12 @@ void Voxelizer::performVoxelization(std::function<void()> drawMainGeometry, std:
             glUniform1i(glGetUniformLocation(shader, "uVoxelRes"), m_params.resolution);
             glUniform1f(glGetUniformLocation(shader, "uVoxelWorldSize"), m_params.worldSize);
             glUniform1i(glGetUniformLocation(shader, "uRenderMode"), 0);
+            glUniform1i(glGetUniformLocation(shader, "uVoxelSplatRadius"), m_params.voxelSplatRadius);
+
         }
 
-        for (int i = 0; i < 3; ++i) {
+        // Now loop through 6 views instead of 3
+        for (int i = 0; i < 6; ++i) {
             for (int ii = 0; ii < usingShaders.size(); ii++) {
                 auto shader = usingShaders[ii];
                 auto modelTransform = modelTransforms[ii];
@@ -245,23 +247,31 @@ void Voxelizer::performVoxelization(std::function<void()> drawMainGeometry, std:
         }
     }
 }
-
 mat4 Voxelizer::createOrthographicProjection() const {
     float halfSize = m_params.worldSize / 2.0f;
-    float margin = 0.01f * m_params.worldSize; // 1% extra
+    // Increase margin at higher rasterization resolutions
+    float pixelSize = m_params.worldSize / float(m_params.voxelizeRes);
+    float margin = pixelSize * 2.0f; // At least 2 pixels of margin
+    
     return ortho(-halfSize - margin, halfSize + margin,
         -halfSize - margin, halfSize + margin,
         -halfSize * 2.0f, halfSize * 2.0f);
 }
 
-std::array<mat4, 3> Voxelizer::createOrthographicViews() const {
+std::array<mat4, 6> Voxelizer::createOrthographicViews() const {
     float halfSize = m_params.worldSize / 2.0f;
     vec3 center = m_params.center;
 
     return {
-        lookAt(center + vec3(halfSize, 0, 0), center, vec3(0, 1, 0)),  // Looking along -X
-        lookAt(center + vec3(0, halfSize, 0), center, vec3(0, 0, 1)),  // Looking along -Y  
-        lookAt(center + vec3(0, 0, halfSize), center, vec3(0, 1, 0))   // Looking along -Z
+        // Original 3 axis-aligned views
+        lookAt(center + vec3(halfSize, 0, 0), center, vec3(0, 1, 0)),  // Along -X
+        lookAt(center + vec3(0, halfSize, 0), center, vec3(0, 0, 1)),  // Along -Y  
+        lookAt(center + vec3(0, 0, halfSize), center, vec3(0, 1, 0)),  // Along -Z
+
+        // Diagonal views for better coverage
+        lookAt(center + normalize(vec3(1, 1, 1)) * halfSize * 1.5f, center, vec3(0, 1, 0)),
+        lookAt(center + normalize(vec3(1, -1, 1)) * halfSize * 1.5f, center, vec3(0, 1, 0)),
+        lookAt(center + normalize(vec3(-1, 1, 1)) * halfSize * 1.5f, center, vec3(0, 1, 0))
     };
 }
 

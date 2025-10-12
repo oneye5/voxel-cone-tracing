@@ -8,6 +8,7 @@ uniform int   uVoxelRes;
 uniform float uVoxelWorldSize;
 uniform int   uRenderMode; // 0 = voxelize, 1 = gbuffer
 uniform vec3 uVoxelCenter;
+uniform int uVoxelSplatRadius;
 
 layout(location = 0) out vec4 gPosition; // world position.xyz + metallic
 layout(location = 1) out vec4 gNormal;   // world normal.xyz + smoothness
@@ -33,7 +34,7 @@ void writeRenderInfo(MaterialData m) {
         if (any(lessThan(vpos, vec3(0))) || any(greaterThan(vpos, vec3(1)))) return;
         ivec3 texCoord = ivec3(vpos * float(uVoxelRes - 1));
 
-        int splatRadius = 0;
+        int splatRadius = uVoxelSplatRadius;
         for (int x = -splatRadius; x <= splatRadius; ++x) {
             for (int y = -splatRadius; y <= splatRadius; ++y) {
                 for (int z = -splatRadius; z <= splatRadius; ++z) {
