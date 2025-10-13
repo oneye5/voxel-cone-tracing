@@ -256,13 +256,13 @@ void BaseTerrain::stepErosion() {
 
 // TODO - implement the sending to the plant manager object thing
 void BaseTerrain::calculateAndSendTreePlacements(const int seed) {
-	std::mt19937 rng(seed);
+	std::mt19937 rng = (seed == -1) ? std::mt19937(std::random_device()()) : std::mt19937(seed);
 	std::uniform_real_distribution<float> uniform_dist(0.0f, 1.0f); // Calculate between 0 and 1 and map to actual position
 
 	std::vector<vec3> positions;
 	positions.reserve(tree_settings.max_trees); // Might not manage to use max trees but hopefully should get somewhere there
 
-	for (int i = 0; i < tree_settings.placement_attempts && positions.size() <= tree_settings.max_trees; i++) {
+	for (int i = 0; i < tree_settings.placement_attempts && positions.size() < tree_settings.max_trees; i++) {
 		const float n_x = uniform_dist(rng);
 		const float n_z = uniform_dist(rng);
 
@@ -283,6 +283,9 @@ void BaseTerrain::calculateAndSendTreePlacements(const int seed) {
 			//std::print("{},{},{}\n", new_pos.x, new_pos.y, new_pos.z);
 		}
 	}
+
+	// TODO - send these to the plant thing
+	sendTreePlacements(positions);
 }
 
 vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
@@ -296,7 +299,26 @@ vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
 	const float world_z = scaled_z + tz;
 
 	// TODO - y position
-	vec3 pos{world_x, 0.0f, world_z};
+	float y_pos = approximateYAtPoint(n_pos);
+	vec3 pos{world_x, y_pos, world_z};
 	//std::print("{},{},{}\n", pos.x, pos.y, pos.z);
 	return pos;
+}
+
+float BaseTerrain::approximateYAtPoint(const vec2 &pos) {
+	const int scaled_x = static_cast<int>(roundf(t_noise.width * pos.x));
+	const int scaled_z = static_cast<int>(roundf(t_noise.height * pos.y));
+
+	const float norm_height = t_noise.heightmap.at(scaled_z * t_noise.width + scaled_x);
+	float height = norm_height * t_settings.model_scale.y * t_settings.amplitude;
+	if (draw_from_min) {height = height - t_settings.min_height;}
+	return height;
+}
+
+// TODO - implement
+void BaseTerrain::sendTreePlacements(std::vector<vec3> &positions) {
+	// Just print the stuff for now :p
+	for (auto& p: positions) {
+		std::print("{:.10f},  {:.10f},  {:.10f}\n", p.x, p.y, p.z);
+	}
 }

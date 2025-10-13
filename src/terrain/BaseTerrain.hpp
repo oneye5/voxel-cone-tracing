@@ -90,13 +90,16 @@ namespace Terrain {
 
 		// Calculate new tree placement positions based on tree_settings and send the data to the plant manager
 		// TODO - obviously implement the sending to the plant manager thing
-		void calculateAndSendTreePlacements(int seed = 1337);
+		void calculateAndSendTreePlacements(int seed = -1);
+		// Basic function to send a vector of tree positions to the tree manager, send empty to prevent trees maybe
+		void sendTreePlacements(std::vector<glm::vec3> &positions);
 
 	private:
 		// Load the textures for the terrain and store them in the fields
 		void loadTextures();
 		// Take a vec2 of x,z position from 0-1 and map it to the actual terrain position when rendered (using the size scalars and heightmap etc)
 		glm::vec3 normalizedXZToWorldPos(const glm::vec2& n_pos);
-
+		// Approximate the y position at provided normalize 0-1 x,z point and return the float value
+		float approximateYAtPoint(const glm::vec2& pos);
 	};
 }
