@@ -8,6 +8,12 @@
 
 namespace Terrain {
 
+	struct TreePlacementSettings {
+		float min_distance = 1.0f; // Min distance apart
+		int max_trees = 10.0f; // The max number of trees to spawn
+		int placement_attempts = 50; // Number of placement attempts (Stops if max_trees already chosen)
+	};
+
 	struct TerrainSettings {
 		float max_height = 1.0f; // Max height of the terrain
 		float min_height = 0.0; // Min height of the terrain
@@ -49,6 +55,7 @@ namespace Terrain {
 		Noise t_noise; // The noise to use for the terrain, contains texture
 		PlaneTerrain t_mesh; // The plane mesh to use
 		int plane_subs = 512;
+		TreePlacementSettings tree_settings;
 		TerrainSettings t_settings;
 
 		HydraulicErosion t_erosion;
@@ -81,9 +88,15 @@ namespace Terrain {
 		void draw() override;
 		glm::mat4 getModelTransform() override;
 
+		// Calculate new tree placement positions based on tree_settings and send the data to the plant manager
+		// TODO - obviously implement the sending to the plant manager thing
+		void calculateAndSendTreePlacements(int seed = 1337);
+
 	private:
 		// Load the textures for the terrain and store them in the fields
 		void loadTextures();
+		// Take a vec2 of x,z position from 0-1 and map it to the actual terrain position when rendered (using the size scalars and heightmap etc)
+		glm::vec3 normalizedXZToWorldPos(const glm::vec2& n_pos);
 
 	};
 }

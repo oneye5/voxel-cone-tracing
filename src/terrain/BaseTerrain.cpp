@@ -7,6 +7,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <imgui.h>
+#include <print>
 #include "opengl.hpp"
 
 using namespace Terrain;
@@ -167,6 +168,18 @@ void BaseTerrain::renderUI() {
 
 	ImGui::Separator();
 
+	ImGui::Text("Tree Placement Controls");
+	// TODO - maybe add some kind of like "auto update flag" to auto calculate new positions and send them to the tree object
+	ImGui::SliderFloat("Minimum distance apart", &tree_settings.min_distance, 0.05f, 20.0f);
+	ImGui::SliderInt("Max tree amount", &tree_settings.max_trees, 1, 3);
+	ImGui::SliderInt("Max Placement Attempts", &tree_settings.placement_attempts, 1, 200);
+
+	if (ImGui::Button("Calculate tree positions")) {
+		calculateAndSendTreePlacements();
+	}
+
+	ImGui::Separator();
+
 	// Erosion controls
 	t_erosion.renderUI();
 
@@ -241,3 +254,49 @@ void BaseTerrain::stepErosion() {
 	}
 }
 
+// TODO - implement the sending to the plant manager object thing
+void BaseTerrain::calculateAndSendTreePlacements(const int seed) {
+	std::mt19937 rng(seed);
+	std::uniform_real_distribution<float> uniform_dist(0.0f, 1.0f); // Calculate between 0 and 1 and map to actual position
+
+	std::vector<vec3> positions;
+	positions.reserve(tree_settings.max_trees); // Might not manage to use max trees but hopefully should get somewhere there
+
+	for (int i = 0; i < tree_settings.placement_attempts && positions.size() <= tree_settings.max_trees; i++) {
+		const float n_x = uniform_dist(rng);
+		const float n_z = uniform_dist(rng);
+
+		vec3 new_pos = normalizedXZToWorldPos({n_x, n_z});
+
+		// Check that new position doesn't collide with existing
+		bool valid = true;
+		for (const vec3& p: positions) {
+			float dist = glm::distance(new_pos, p);
+			if (dist < tree_settings.min_distance) {
+				valid = false;
+				break;
+			}
+		}
+
+		if (valid) {
+			positions.push_back(new_pos);
+			//std::print("{},{},{}\n", new_pos.x, new_pos.y, new_pos.z);
+		}
+	}
+}
+
+vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
+	const float scaled_x = (n_pos.x * 2.0f) * t_settings.model_scale.x;
+	const float scaled_z = (n_pos.y * 2.0f) * t_settings.model_scale.z;
+
+	const float tx = -2.0f - (t_settings.model_scale.x / 2.0f);
+	const float tz = -2.0f - (t_settings.model_scale.z / 2.0f);
+
+	const float world_x = scaled_x + tx;
+	const float world_z = scaled_z + tz;
+
+	// TODO - y position
+	vec3 pos{world_x, 0.0f, world_z};
+	//std::print("{},{},{}\n", pos.x, pos.y, pos.z);
+	return pos;
+}
