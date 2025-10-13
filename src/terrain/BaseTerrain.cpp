@@ -155,6 +155,9 @@ void BaseTerrain::renderUI() {
 		if (ImGui::DragFloat("Sea size scalar", &water_plane->size_scalar, 0.01f, 2.5f)) {
 			water_plane->update_transform(vec3(t_settings.model_scale), t_settings.sea_level);
 		}
+		if (ImGui::Button("Make Water Reflective (FPS Heavy)")) {
+			water_plane->smoothness = WaterPlane::SHINY_SMOOTHNESS;
+		}
 		ImGui::DragFloat("Wave Speed", &water_plane->wave_speed, 0.0001f, 0.001f, 0.5f, "%.5f");
 		ImGui::SliderFloat("Water metallicness", &water_plane->metallic, 0.0f, 1.0f);
 		ImGui::SliderFloat("Water smoothness (fps heavy)", &water_plane->smoothness, 0.0f, 1.0f);

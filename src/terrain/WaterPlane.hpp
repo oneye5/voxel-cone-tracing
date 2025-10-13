@@ -29,8 +29,9 @@ namespace Terrain {
 		float wave_speed = 0.0005f;
 
 		// For testing shader things
+		static constexpr float SHINY_SMOOTHNESS = 0.77f; // Smoothness to use for nice reflections
 		float metallic = 0.5f;
-		float smoothness = 0.77f;
+		float smoothness = 0.5f;
 		float move_factor = 0.0f; // wave move factor
 
 		// Renderable methods
