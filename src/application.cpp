@@ -224,6 +224,7 @@ Application::Application(GLFWwindow* window) : m_window(window) {
 }
 
 void Application::updateCameraMovement(float deltaTime) {
+	m_yaw = std::clamp(m_yaw, -pi<float>(), pi<float>());
 	// Calculate forward and right directions
 	vec3 forward = vec3(
 		sin(m_yaw) * cos(m_pitch),

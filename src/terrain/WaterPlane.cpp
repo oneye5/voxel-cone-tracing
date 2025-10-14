@@ -41,10 +41,12 @@ WaterPlane::WaterPlane(GLuint texid) : plane_mesh(cgra::CREATE_PLANE(256, 256, 2
 
 void WaterPlane::update_transform(glm::vec3 model_scale, float sea_level) {
 	vec3 scale = vec3(model_scale.x * size_scalar, model_scale.y, model_scale.z * size_scalar);
+	vec3 scaled_center = vec3(scale.x, 0.0f, scale.z);
+
+	vec3 translation = vec3(-scaled_center.x, sea_level, -scaled_center.z);
+
 	mat4 m_scale = glm::scale(mat4(1.0f), scale);
-	float offset = -2.0f * size_scalar;
-	vec3 trans = vec3(offset - (scale.x / 2.0f), sea_level, offset - (scale.z / 2.0f));
-	mat4 m_trans = glm::translate(mat4(1.0f), trans);
+	mat4 m_trans = glm::translate(mat4(1.0f), translation);
 
 	model_transform = m_trans * m_scale;
 }

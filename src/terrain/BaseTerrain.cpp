@@ -115,9 +115,13 @@ static PlaneTerrain CreateBasicPlane(int x_sub, int z_sub) {
 }
 
 void PlaneTerrain::updateTransformCentered(vec3 scale) {
+	constexpr vec3 original_center = vec3(1.0f, 0.0f, 1.0f);
+
+	vec3 scaled_center = original_center * scale;
+
+	mat4 m_translation = glm::translate(mat4(1.0f), -scaled_center);
 	mat4 m_scale = glm::scale(mat4(1.0f), scale);
-	vec3 translation = vec3(-2.0f - (scale.x/2.0f), 0, -2.0f - (scale.z/2.0f));
-	mat4 m_translation = glm::translate(mat4(1.0f), translation);
+
 	init_transform = m_translation * m_scale;
 }
 
@@ -295,13 +299,9 @@ vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
 	const float scaled_x = (n_pos.x * 2.0f) * t_settings.model_scale.x;
 	const float scaled_z = (n_pos.y * 2.0f) * t_settings.model_scale.z;
 
-	const float tx = -2.0f - (t_settings.model_scale.x / 2.0f);
-	const float tz = -2.0f - (t_settings.model_scale.z / 2.0f);
-
-	const float world_x = scaled_x + tx;
-	const float world_z = scaled_z + tz;
-
-	// TODO - y position
+	const float world_x = scaled_x - t_settings.model_scale.x;
+	const float world_z = scaled_z - t_settings.model_scale.z;
+	
 	float y_pos = approximateYAtPoint(n_pos);
 	vec3 pos{world_x, y_pos, world_z};
 	//std::print("{},{},{}\n", pos.x, pos.y, pos.z);
@@ -309,8 +309,8 @@ vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
 }
 
 float BaseTerrain::approximateYAtPoint(const vec2 &pos) {
-	const int scaled_x = static_cast<int>(roundf(t_noise.width * pos.x));
-	const int scaled_z = static_cast<int>(roundf(t_noise.height * pos.y));
+	const int scaled_x = static_cast<int>(fminf(roundf(t_noise.width * pos.x), t_noise.width-1));
+	const int scaled_z = static_cast<int>(fminf(roundf(t_noise.height * pos.y), t_noise.height-1));
 
 	const float norm_height = t_noise.heightmap.at(scaled_z * t_noise.width + scaled_x);
 	float height = norm_height * t_settings.model_scale.y * t_settings.amplitude;
