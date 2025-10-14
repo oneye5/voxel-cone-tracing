@@ -125,19 +125,6 @@ void Plant::recalculate_mesh() {
 	glBindVertexArray(0);
 }
 
-std::vector<Plant> plant::create_plants(std::vector<create_plants_input> inputs) {
-	std::vector<Plant> ret;
-
-	for (auto pt : inputs) {
-		Plant p = Plant(known_plants.tree);
-		p.trunk.modelTransform = translate(p.trunk.modelTransform, pt.pos);
-		p.canopy.modelTransform = translate(p.canopy.modelTransform, pt.pos);
-		ret.push_back(p);
-	}
-
-	return ret;
-}
-
 // - mesh
 Mesh::Mesh() : mesh{}, shader{0}, modelTransform{1} {}
 
@@ -162,4 +149,35 @@ void Mesh::draw() {
 	// TODO: textures or whatever
 	if (!planttt) return;
 	mesh.draw();
+}
+
+PlantManager::PlantManager(Renderer* renderer) : renderer{renderer} {}
+PlantManager::PlantManager() {}
+void PlantManager::clear() {
+	// Assuming that the item at the back is the one with the largest index
+	for (auto it = plants.rbegin(); it != plants.rend(); it++) {
+		renderer->renderables.erase(renderer->renderables.begin() + it->first + 1);
+		renderer->renderables.erase(renderer->renderables.begin() + it->first);
+	}
+	plants.clear();
+}
+
+void PlantManager::update_plants(std::vector<plants_manager_input> inputs) {
+	this->clear();
+	std::vector<Plant> temp_plants;
+
+	for (auto pt : inputs) {
+		Plant p = Plant(known_plants.tree);
+		p.trunk.modelTransform = translate(p.trunk.modelTransform, pt.pos);
+		p.canopy.modelTransform = translate(p.canopy.modelTransform, pt.pos);
+		temp_plants.push_back(p);
+	}
+
+	auto base = renderer->renderables.size();
+	for (auto plant : temp_plants) {
+		plants.push_back({base, plant});
+		renderer->addRenderable(&plants.back().second.canopy);
+		renderer->addRenderable(&plants.back().second.trunk);
+		base += 2;
+	}
 }

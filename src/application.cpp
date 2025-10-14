@@ -42,6 +42,7 @@ Terrain::BaseTerrain* t_terrain = nullptr;
 ExampleRenderable* exampleRenderable = nullptr;
 ExampleRenderable* exampleRenderable2 = nullptr;
 Terrain::WaterPlane* t_water = nullptr;
+plant::PlantManager plantManager;
 
 // scene 1
 CubeRenderable* floor1 = nullptr;
@@ -67,6 +68,7 @@ void resetScene() {
 
 void loadScene0() {
 	resetScene();
+	plantManager = plant::PlantManager(renderer);
 
 	t_terrain = new Terrain::BaseTerrain();
 	t_water = new Terrain::WaterPlane();
@@ -113,11 +115,9 @@ void loadScene0() {
 	//renderer->addRenderable(exampleRenderable2);
 
 	// Create some debug plants
-	plants = plant::create_plants({ {{0,1,0}} });
-	for (auto& p : plants) {
-		renderer->addRenderable(&p.trunk);
-		renderer->addRenderable(&p.canopy);
-	}
+	// ({ {{0,1,0}} });
+	plantManager.update_plants({{{0,1,0}}});
+
 
 	// renderer tweaks based on scene size
 	renderer->voxelizer->setCenter(glm::vec3(-5, 5, -5));
