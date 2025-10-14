@@ -190,8 +190,3 @@ void PlantManager::grow(int step) {
 		plant.second.grow(step);
 	}
 }
-std::ostream& operator<<(std::ostream& os, plants_manager_input const& m) {
-	return os << "PM_Input["
-		<< "pos=(" << m.pos.x <<", " << m.pos.y << ", " << m.pos.z << ")"
-		<<"]";
-}
