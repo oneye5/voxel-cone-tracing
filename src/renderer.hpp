@@ -3,6 +3,8 @@
 #include <vct/gBufferPrepass.hpp>
 #include <vct/gBufferLightingPass.hpp>
 #include <vct/voxelizer.hpp>
+#ifndef BAKINGBAD_RENDERER_H
+#define BAKINGBAD_RENDERER_H
 
 struct debug_parameters {
     bool voxel_debug_mode_on;
@@ -105,3 +107,4 @@ public:
         }
     }
 };
+#endif
