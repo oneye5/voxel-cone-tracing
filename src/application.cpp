@@ -71,6 +71,7 @@ void loadScene0() {
 	plantManager = plant::PlantManager(renderer);
 
 	t_terrain = new Terrain::BaseTerrain();
+	t_terrain->plant_manager = &plantManager;
 	t_water = new Terrain::WaterPlane();
 	t_terrain->water_plane = t_water;
 	light = new PointLightRenderable();

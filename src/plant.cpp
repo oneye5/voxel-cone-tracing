@@ -163,7 +163,7 @@ void PlantManager::clear() {
 	plants.clear();
 }
 
-void PlantManager::update_plants(std::vector<plants_manager_input> inputs) {
+void PlantManager::update_plants(const std::vector<plants_manager_input>& inputs) {
 	this->clear();
 	std::vector<Plant> temp_plants;
 

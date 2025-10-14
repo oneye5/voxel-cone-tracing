@@ -325,4 +325,6 @@ void BaseTerrain::sendTreePlacements(std::vector<plant::plants_manager_input> &p
 		std::cout << p << std::endl;
 		// std::print("{:.10f},  {:.10f},  {:.10f}\n", p.pos.x, p.pos.y, p.pos.z);
 	}
+
+	plant_manager->update_plants(positions);
 }

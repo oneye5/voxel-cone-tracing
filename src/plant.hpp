@@ -75,6 +75,6 @@ namespace plant {
 
 		void grow(int step = 1);
 		void clear();
-		void update_plants(std::vector<plants_manager_input> inputs);
+		void update_plants(const std::vector<plants_manager_input>& inputs);
 	};
 }

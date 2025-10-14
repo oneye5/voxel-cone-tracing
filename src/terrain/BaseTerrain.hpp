@@ -58,6 +58,7 @@ namespace Terrain {
 		int plane_subs = 512;
 		TreePlacementSettings tree_settings;
 		TerrainSettings t_settings;
+		plant::PlantManager * plant_manager;
 
 		HydraulicErosion t_erosion;
 		bool erosion_running = false; // Whether or not the erosion sim is currently running (in real-time)
