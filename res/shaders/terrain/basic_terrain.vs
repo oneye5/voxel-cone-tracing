@@ -55,7 +55,6 @@ vec3 calculateNormal(vec2 texCoord) {
 void main() {
 	// transform vertex data to viewspace
 	float height = texture(heightMap, aTexCoord).r * amplitude;
-	// float y_pos = max_height * height;
 	float y_pos = (draw_from_min) ? height - min_height : height;
 
 	// Push edge vertices down to y=0.0 to prevent the open ended sides (not the best implementation but whatev)

@@ -88,6 +88,7 @@ void writeRenderInfo(MaterialData m) {
     }
 }
 
+// Original height-based implementation of texturing, not the best but leaving in for future reference
 vec3 getTerrainColor(vec2 uv, float height) {
 	// Define height thresholds
 	const float water_level = 0.15;
@@ -185,11 +186,7 @@ void main() {
 	float height = texture(heightMap, f_in.textureCoord).r;
 	vec3 col;
 	if (useTexturing) {
-		//col = texture(sand_texture, f_in.textureCoord * tex_base_scalar).rgb;
-		// col = getTerrainColor(f_in.textureCoord * tex_base_scalar, height).xyz;
-		// col = getTerrainColorSlope(f_in.textureCoord * tex_base_scalar, f_in.normal);
 		col = (use_triplanar_mapping) ? getTerrainColorSlopeTriplanar(f_in.position, normalize(f_in.normal)) : getTerrainColorSlope(f_in.textureCoord * tex_base_scalar, f_in.normal);
-		// col = getTerrainColorSlopeTriplanar(f_in.position, normalize(f_in.normal));
 	} else {
 		col = vec3(height, height, height);
 	}
@@ -198,7 +195,7 @@ void main() {
 		col = mix(vec3(height, height, height), col, 0.8);
 
 		// Calculate lighting
-		vec3 eye = normalize(vec3(1.5, 10.0, 2.0)); // faked light position
+		vec3 eye = normalize(vec3(0.0, 10.0, 0.0)); // faked light position
 		vec3 normal = normalize(f_in.normal);
 
 		// Diffuse lighting
