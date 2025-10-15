@@ -1,6 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <random>
 #include <string>
+#include <vector>
 #include "lsystem.hpp"
 #include "cgra/cgra_mesh.hpp"
 #include "opengl.hpp"
@@ -29,6 +31,14 @@ namespace plant {
 		GLuint trunk_shader;
 		GLuint canopy_shader;
 		// TODO: Textures?
+	};
+
+	class Node {
+		public:
+		virtual ~Node() = 0;
+
+		virtual std::vector<Node> grow(std::minstd_rand &rng) const = 0;
+		virtual void render(std::vector<glm::mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const = 0;
 	};
 
 	class Plant {
