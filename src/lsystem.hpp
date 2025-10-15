@@ -6,6 +6,5 @@
 
 namespace lsystem {
 	typedef std::unordered_map<char, std::string> ruleset;
-	ruleset parse_rules(std::istream& rules);
 	std::string iterate(const std::string& seed, const ruleset& rules, int count = 1);
 }
