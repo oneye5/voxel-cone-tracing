@@ -3,7 +3,7 @@
 #include "cgra/cgra_mesh.hpp"
 #include <random>
 
-namespace plant::node {
+namespace lsystem::node {
 	class Node {
 		public:
 		virtual ~Node();

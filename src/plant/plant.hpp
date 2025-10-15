@@ -4,26 +4,14 @@
 #include <string>
 #include <vector>
 #include "lsystem.hpp"
-#include "cgra/cgra_mesh.hpp"
 #include "opengl.hpp"
 #include "renderer.hpp"
 #include "plant/mesh.hpp"
+#include "plant/data.hpp"
 
 namespace plant {
-	struct PlantData {
-		lsystem::ruleset rules;
-		std::string seed;
-		GLuint trunk_shader;
-		GLuint canopy_shader;
-		// TODO: Textures?
-	};
-
-
 	class Plant {
 		std::minstd_rand rng;
-		lsystem::ruleset ruleset;
-		std::string seed;
-		/** Current representation of the plant as a string */
 		std::string current;
 		void recalculate_mesh();
 
@@ -31,15 +19,10 @@ namespace plant {
 		Mesh trunk;
 		Mesh canopy;
 
-		Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps = 0);
-		Plant(PlantData data, int steps = 2);
+		Plant(lsystem::ruleset current, GLuint trunk_shader, GLuint canopy_shader, unsigned long rng_seed, int steps = 0);
+		Plant(data::PlantData data, int steps = 2);
 		void grow(int steps = 1);
 	};
-
-	struct KnownPlants{
-		PlantData tree;
-	};
-	extern KnownPlants known_plants;
 
 	struct plants_manager_input {
 		glm::vec3 pos;

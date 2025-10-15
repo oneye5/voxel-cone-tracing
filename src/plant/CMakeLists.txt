@@ -5,10 +5,6 @@ set(sources
 	"plant.hpp"
 	"data.hpp"
 	"plant.cpp"
-	"mesh.hpp"
-	"node/node.hpp"
-	"node/common.hpp"
-	"node/common.cpp"
-	"node/node.cpp")
+	"mesh.hpp")
 # Add these sources to the project target
 target_relative_sources(${CGRA_PROJECT} ${sources})

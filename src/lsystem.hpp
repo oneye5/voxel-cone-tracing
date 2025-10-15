@@ -2,9 +2,10 @@
 #include <istream>
 #include <optional>
 #include <string>
-#include <unordered_map>
+#include "lsystem/node/node.hpp"
+#include <vector>
 
 namespace lsystem {
-	typedef std::unordered_map<char, std::string> ruleset;
-	std::string iterate(const std::string& seed, const ruleset& rules, int count = 1);
+	typedef std::vector<const node::Node *> ruleset;
+	std::string iterate(const ruleset &current, std::minstd_rand &rng, const int count = 1);
 }

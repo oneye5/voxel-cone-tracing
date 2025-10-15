@@ -1,6 +1,7 @@
 #include "plant.hpp"
 #include "cgra/cgra_mesh.hpp"
 #include "lsystem.hpp"
+#include "plant/data.hpp"
 #include "opengl.hpp"
 #include <ostream>
 #include <string>
@@ -12,8 +13,6 @@
 
 using namespace plant;
 using namespace glm;
-
-KnownPlants plant::known_plants;
 
 Plant::Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps) :
 	ruleset{ruleset},

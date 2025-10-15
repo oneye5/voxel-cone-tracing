@@ -1,7 +1,8 @@
-#include "plant/node/node.hpp"
+#include "lsystem/node/node.hpp"
 
-namespace plant::node {
+namespace lsystem::node {
 	std::vector<const Node *> Node::grow(std::minstd_rand &rng) const {
+		(void)rng;
 		return std::vector{this};
 	}
 

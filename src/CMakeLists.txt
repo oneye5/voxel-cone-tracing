@@ -15,6 +15,7 @@ add_executable(${CGRA_PROJECT} ${sources})
 add_subdirectory(cgra)
 add_subdirectory(terrain)
 add_subdirectory(plant)
+add_subdirectory(lsystem)
 add_subdirectory(vct)
 
 #########################################################

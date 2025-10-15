@@ -1,28 +1,20 @@
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <vector>
-#include <istream>
-#include <sstream>
 #include <string>
-#include <unordered_map>
-#include "imgui.h"
 #include "lsystem.hpp"
 
 using std::vector;
 
-std::string lsystem::iterate(const std::string &seed, const ruleset &rules, int count) {
-	std::string cur = seed;
+lsystem::ruleset lsystem::iterate(const lsystem::ruleset &current, std::minstd_rand &rng, const int count) {
+	lsystem::ruleset prev = current;
+	lsystem::ruleset cur;
 	for (int i = 0; i < count; i++) {
-		std::stringstream res{};
-		for (const auto& c : cur) {
-			if (rules.find(c) != rules.end()) {
-				res << rules.at(c);
-			} else {
-				res << c;
-			}
+		for (const auto& n : prev) {
+			auto vec = n.grow();
+			cur.insert(cur.end(), vec.begin(), vec.end());
+			cur.push_back();
 		}
-		cur = res.str();
 	}
+
 	return cur;
 }
