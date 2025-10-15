@@ -16,4 +16,6 @@ namespace plant::data {
 	};
 
 	extern KnownPlants known_plants;
+
+	void init_known_plants();
 }

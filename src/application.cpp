@@ -79,22 +79,7 @@ void loadScene0() {
 	exampleRenderable2 = new ExampleRenderable();
 
 	// Initialise plant data
-	plant::known_plants.tree.seed = "A";
-	plant::known_plants.tree.rules = { {'A', "F[&[+A][--A]]???[^[+A][--A]]"} };
-	{
-		cgra::shader_builder sb;
-		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));
-		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_frag.glsl"));
-		sb.set_shader(GL_GEOMETRY_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_geom.glsl"));
-		plant::known_plants.tree.trunk_shader = sb.build();
-	}
-	{
-		cgra::shader_builder sb;
-		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_vert.glsl"));
-		sb.set_shader(GL_GEOMETRY_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_geom.glsl"));
-		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_frag.glsl"));
-		plant::known_plants.tree.canopy_shader = sb.build();
-	}
+	plant::data::init_known_plants();
 	//---
 
 	// modifactions
