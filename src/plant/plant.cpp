@@ -14,7 +14,6 @@ using namespace plant;
 using namespace glm;
 
 KnownPlants plant::known_plants;
-bool planttt = true;
 
 Plant::Plant(std::string seed, GLuint trunk_shader, GLuint canopy_shader, lsystem::ruleset ruleset, int steps) :
 	ruleset{ruleset},
@@ -124,32 +123,6 @@ void Plant::recalculate_mesh() {
 	
 	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void *)0);
 	glBindVertexArray(0);
-}
-
-// - mesh
-Mesh::Mesh() : mesh{}, shader{0}, modelTransform{1} {}
-
-Mesh::Mesh(GLuint shader) : mesh{}, shader{shader}, modelTransform{1} {}
-
-GLuint Mesh::getShader() {
-	return shader;
-}
-
-mat4 Mesh::getModelTransform() {
-	return modelTransform;
-}
-
-void Mesh::setProjViewUniforms(const glm::mat4& view, const glm::mat4& proj) const {
-	glUseProgram(shader);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uProjectionMatrix"), 1, false, value_ptr(proj));
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uViewMatrix"), 1, false, value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(shader, "uModelMatrix"), 1, false, value_ptr(modelTransform));
-}
-
-void Mesh::draw() {
-	// TODO: textures or whatever
-	if (!planttt) return;
-	mesh.draw();
 }
 
 PlantManager::PlantManager(Renderer* renderer) : renderer{renderer} {}
