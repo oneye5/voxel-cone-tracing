@@ -28,14 +28,14 @@ namespace plant::node::common {
 	Translate::~Translate() {}
 
 	void TrunkVertex::render(std::vector<mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
-		// TODO: Normals
+		// TODO: Normals: translate by one then see where that leaves us as the normal?
 		trunk.push_index(trunk.push_vertex({stack.back() * vec4{0,0,0,1}}));
 	}
 	TrunkVertex::~TrunkVertex() {}
 	const TrunkVertex *trunkVertex = new TrunkVertex();
 
 	void CanopyVertex::render(std::vector<mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
-		// TODO: Normals
+		// TODO: Normals: translate by one then see where that leaves us as the normal?
 		canopy.push_index(trunk.push_vertex({stack.back() * vec4{0,0,0,1}}));
 	}
 	CanopyVertex::~CanopyVertex() {}
