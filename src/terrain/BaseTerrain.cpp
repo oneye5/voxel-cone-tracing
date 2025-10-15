@@ -312,11 +312,12 @@ vec3 BaseTerrain::normalizedXZToWorldPos(const vec2 &n_pos) {
 }
 
 float BaseTerrain::approximateYAtPoint(const vec2 &pos) {
+	constexpr float Y_REDUCTION = 0.1f; // Amount to reduce the calculated y by, to avoid trees starting above ground
 	const int scaled_x = static_cast<int>(fminf(roundf(t_noise.width * pos.x), t_noise.width-1));
 	const int scaled_z = static_cast<int>(fminf(roundf(t_noise.height * pos.y), t_noise.height-1));
 
 	const float norm_height = t_noise.heightmap.at(scaled_z * t_noise.width + scaled_x);
-	float height = norm_height * t_settings.model_scale.y * t_settings.amplitude;
+	float height = (norm_height - Y_REDUCTION) * t_settings.model_scale.y * t_settings.amplitude;
 	if (draw_from_min) {height = height - t_settings.min_height;}
 	return height;
 }
