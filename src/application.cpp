@@ -19,7 +19,7 @@
 #include <point_light_renderable.cpp>
 
 #include "lsystem.hpp"
-#include "plant.hpp"
+#include "plant/plant.hpp"
 
 #include "terrain/BaseTerrain.hpp"
 #include "terrain/WaterPlane.hpp"
