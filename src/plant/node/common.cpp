@@ -13,13 +13,13 @@ namespace plant::node::common {
 		stack.push_back(stack.back());
 	}
 	Push::~Push() {}
-	Push *push = new Push();
+	const Push *push = new Push();
 
 	void Pop::render(std::vector<mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		stack.pop_back();
 	}
 	Pop::~Pop() {}
-	Pop *pop = new Pop();
+	const Pop *pop = new Pop();
 
 	Translate::Translate(vec3 dist) : dist{dist} {}
 	void Translate::render(std::vector<mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
@@ -32,12 +32,12 @@ namespace plant::node::common {
 		trunk.push_index(trunk.push_vertex({stack.back() * vec4{0,0,0,1}}));
 	}
 	TrunkVertex::~TrunkVertex() {}
-	TrunkVertex *trunkVertex = new TrunkVertex();
+	const TrunkVertex *trunkVertex = new TrunkVertex();
 
 	void CanopyVertex::render(std::vector<mat4> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		// TODO: Normals
 		canopy.push_index(trunk.push_vertex({stack.back() * vec4{0,0,0,1}}));
 	}
 	CanopyVertex::~CanopyVertex() {}
-	CanopyVertex *canopyVertex = new CanopyVertex();
+	const CanopyVertex *canopyVertex = new CanopyVertex();
 }
