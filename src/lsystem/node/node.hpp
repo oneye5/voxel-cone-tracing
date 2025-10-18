@@ -15,6 +15,6 @@ namespace lsystem::node {
 
 		virtual std::vector<const Node*> grow(std::minstd_rand &rng) const;
 
-		virtual void render(std::vector<node_stack> stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const = 0;
+		virtual void render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const = 0;
 	};
 }

@@ -44,69 +44,9 @@ void Plant::recalculate_mesh() {
 	static float angle = 0.3;
 	float size = 1;
 	mat4 trans = mat4(1);
-	struct stackItem {
-		mat4 trans;
-		float size;
-		float step;
-	};
 	std::vector<float> steps;
 	std::vector<stackItem> stack = {};
 	// lsystemdatastruct;
-	for (const auto &c: current) {
-		switch (c) {
-			case 'A': // To-grow
-				{
-					vec4 a = trans * vec4{0,0,0,1};
-					trans = translate(trans, {0, size/2.0, 0});
-					vec4 b = trans * vec4{0,0,0,1};
-					vec4 norm = normalize(b-a);
-					canopy_mb.push_index(canopy_mb.push_vertex({a, vec3{norm}}));
-					// canopy_mb.push_index(canopy_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
-					size *= 0.8;
-				}
-
-				break;
-			case 'F': // Permanent growth
-				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
-				trans = translate(trans, {0, size, 0});
-				trunk_mb.push_index(trunk_mb.push_vertex({{trans * vec4{0,0,0,1}}, {0,0,1}}));
-				steps.push_back(step);
-				step += 1;
-				steps.push_back(step);
-				size *= 0.8;
-
-				break;
-			case '-': // Rot back Z
-				trans = rotate(trans, -angle, {0,0,1});
-				break;
-			case '+': // Rot forward Z
-				trans = rotate(trans, angle, {0,0,1});
-				break;
-
-			case '^': // Rot back X
-				trans = rotate(trans, -angle, {1,0,0});
-				break;
-			case '&': // Rot forward X
-				trans = rotate(trans, angle, {1,0,0});
-				break;
-			case '!': // Rot back Y
-				trans = rotate(trans, -angle, {0,1,0});
-				break;
-			case '?': // Rot forward Y
-				trans = rotate(trans, angle, {0,1,0});
-				break;
-			case '[': // Push matrix
-				stack.push_back({trans, size, step});
-				break;
-			case ']': // Pop matrix
-				const auto &last = stack.back();
-				size = last.size;
-				trans = last.trans;
-				step = last.step;
-				stack.pop_back();
-				break;
-		}
-	}
 
 	trunk.mesh = trunk_mb.build();
 	canopy.mesh = canopy_mb.build();
