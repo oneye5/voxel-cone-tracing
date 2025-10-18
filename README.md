@@ -8,31 +8,31 @@ Light pos: 	Position of primary light source. Voxelization needs to occur for ch
 Light scale: 	Scale of primary light source, higher scales result in a brighter scene. Voxelization needs to occur for changes to be reflected.<br>
 Light color:	The color of the light emitted from the primary light source. Voxelization needs to occur for changes to be reflected.<br>
 Light brightness: The emission strength of the primary light source. Voxelization needs to occur for changes to be reflected.<br>
-Ambient RGB:	The ambient color. Color is added based on AO.
-Diffuse brightness multiplier:	Multiplies the light received from surfaces, can be used to weak how bright the scene appears.
-AO multiplier:	Amplifies the AO term.
-Contrast:	Changes the contrast of each fragment.
-Horizon color:	Color of sky horizon. 
-Zenith color: 	Color of sky zenith.
-Filmic tone mapping:	Toggles tone mapping on or off.
-Cone aperture:	The aperture of diffuse cones, wider cones sample from lower quality mip maps but captures less fine detail. 
-Cone step multiplier:	How large each step is when walking along the direction of a cone. 
-Number of diffuse cones:	How many diffuse cones are traced in a hemisphere. Higher achieves greater detail, at the cost of FPS. 
-Transmittance needed for cone termination:	When transmittance is below the threshold, the cone gets terminated. A higher number results in performance improvements.
-Cone offset:	How far away a cone is traced from a hit surface, exists to avoid self intersection. 
-Reflection cone aperture:	Aperture of geometry reflection cones, only relevant for smooth surfaces.
-Cone max steps:	The max number of steps when walking along a cones direction, lower results in better performance.
-Reflection blend lower bound:	The smoothness value needed to start blending specular and geometry reflections, surfaces with smoothness less than this value only receive specular reflections. 
-Reflection blend upper bound:	The upper bound smoothness value for blending. Everything between this and the lower bound receives a blend of specular, and geometry reflections depending on where it lies in the range. 
-Gbuffer debug enable:	Toggles debug view for the gbuffer, used in conjunction with the following controls:
-Gbuffer show X as RGB:	Samples X as the fragment color, useful for visualizing the gbuffer.
-Gbuffer show voxel sampled position as RGB:	Samples the voxel albedo using the gbuffer position. A useful visualization of the voxel representation. 
-Voxel conservative rasterization:	Enables conservative rasterization for the voxelization pass.
-Voxelization render resolution:	The 'viewport' resolution when rendering geometry for voxelization, too high of a value results in little geometry being captured, too low of a value results in poor detail. 
-Voxel splat radius:	Voxels are placed in a radius for each 'geometry hit'. Results in thicker planes, useful to avoid cones skipping through geometry.
-Voxel debug mode:	Enables the voxel debug mode.
-Voxel slice:	Determines the Z slice of what to display when using voxel debug mode.
-Voxel show X as RGB:	When using voxel debug mode, renders fragments using X as the RGB. 
+Ambient RGB:	The ambient color. Color is added based on AO.<br>
+Diffuse brightness multiplier:	Multiplies the light received from surfaces, can be used to weak how bright the scene appears.<br>
+AO multiplier:	Amplifies the AO term.<br>
+Contrast:	Changes the contrast of each fragment.<br>
+Horizon color:	Color of sky horizon.<br> 
+Zenith color: 	Color of sky zenith.<br>
+Filmic tone mapping:	Toggles tone mapping on or off.<br>
+Cone aperture:	The aperture of diffuse cones, wider cones sample from lower quality mip maps but captures less fine detail.<br>
+Cone step multiplier:	How large each step is when walking along the direction of a cone. <br>
+Number of diffuse cones:	How many diffuse cones are traced in a hemisphere. Higher achieves greater detail, at the cost of FPS. <br>
+Transmittance needed for cone termination:	When transmittance is below the threshold, the cone gets terminated. A higher number results in performance improvements.<br>
+Cone offset:	How far away a cone is traced from a hit surface, exists to avoid self intersection. <br>
+Reflection cone aperture:	Aperture of geometry reflection cones, only relevant for smooth surfaces.<br>
+Cone max steps:	The max number of steps when walking along a cones direction, lower results in better performance.<br>
+Reflection blend lower bound:	The smoothness value needed to start blending specular and geometry reflections, surfaces with smoothness less than this value only receive specular reflections. <br>
+Reflection blend upper bound:	The upper bound smoothness value for blending. Everything between this and the lower bound receives a blend of specular, and geometry reflections depending on where it lies in the range. <br>
+Gbuffer debug enable:	Toggles debug view for the gbuffer, used in conjunction with the following controls:<br>
+Gbuffer show X as RGB:	Samples X as the fragment color, useful for visualizing the gbuffer.<br>
+Gbuffer show voxel sampled position as RGB:	Samples the voxel albedo using the gbuffer position. A useful visualization of the voxel representation. <br>
+Voxel conservative rasterization:	Enables conservative rasterization for the voxelization pass.<br>
+Voxelization render resolution:	The 'viewport' resolution when rendering geometry for voxelization, too high of a value results in little geometry being captured, too low of a value results in poor detail. <br>
+Voxel splat radius:	Voxels are placed in a radius for each 'geometry hit'. Results in thicker planes, useful to avoid cones skipping through geometry.<br>
+Voxel debug mode:	Enables the voxel debug mode.<br>
+Voxel slice:	Determines the Z slice of what to display when using voxel debug mode.<br>
+Voxel show X as RGB:	When using voxel debug mode, renders fragments using X as the RGB. <br>
 
 # How to run
 The project can be built and run the same way as the CGRA framework, the readme from which is pasted below:
