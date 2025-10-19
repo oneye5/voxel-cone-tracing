@@ -8,7 +8,7 @@ using namespace plant::data;
 KnownPlants plant::data::known_plants;
 
 static void tree(PlantData &data) {
-	data.initial = lsystem::ruleset{};
+	data.initial = lsystem::ruleset{lsystem::node::tree::leaf};
 	{
 		cgra::shader_builder sb;
 		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));

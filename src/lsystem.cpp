@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <vector>
-#include <string>
 #include "lsystem.hpp"
 
 using std::vector;
@@ -18,5 +16,5 @@ lsystem::ruleset lsystem::iterate(const lsystem::ruleset &current, std::minstd_r
 		cur.clear();
 	}
 
-	return cur;
+	return prev;
 }

@@ -13,4 +13,7 @@ namespace lsystem::node::tree {
 		virtual void render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const override;
 		virtual ~Branch();
 	};
+
+	extern std::shared_ptr<const Branch> branch;
+	extern std::shared_ptr<const Leaf> leaf;
 }
