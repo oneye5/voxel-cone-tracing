@@ -8,9 +8,11 @@ namespace lsystem::node {
 		glm::mat4 trans;
 		float size;
 		float step;
+		std::vector<float> *steps;
 	};
 	class Node {
 		public:
+		Node();
 		virtual ~Node();
 
 		virtual std::vector<const Node*> grow(std::minstd_rand &rng) const;

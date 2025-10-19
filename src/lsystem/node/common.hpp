@@ -26,6 +26,16 @@ namespace lsystem::node::common {
 		virtual ~Translate();
 	};
 
+	template<glm::vec3 axis>
+	class Rotate : public Node {
+		float angle;
+		public:
+		Rotate(float angle);
+		virtual void render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const override;
+		virtual ~Rotate();
+
+	};
+
 	class TrunkVertex : public Node {
 		public:
 

@@ -5,6 +5,6 @@ namespace lsystem::node {
 		(void)rng;
 		return std::vector{this};
 	}
-
+	Node::Node() {}
 	Node::~Node() {}
 }
