@@ -37,7 +37,7 @@ static void tree(PlantData &data) {
 
 static void bush(PlantData &data) {
 	data.initial = lsystem::ruleset{std::make_shared<RotateY>(0.0f, 6.283185307f), lsystem::node::bush::vertical, std::make_shared<RotateZ>(0.5, 0.3), lsystem::node::bush::branch, lsystem::node::bush::leaf};
-	data.size = 0.1;
+	data.size = 0.05;
 	{
 		cgra::shader_builder sb;
 		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_trunk_vert.glsl"));

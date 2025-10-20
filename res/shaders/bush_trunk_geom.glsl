@@ -43,11 +43,11 @@ void main() {
     vec3 up = abs(lineDir.y) > 0.9 ? vec3(1, 0, 0) : vec3(0, 1, 0);
     vec3 right = normalize(cross(lineDir, up));
     up = normalize(cross(right, lineDir));
-	float decay = 0.5;
-	// float startMult = pow(decay, sizes[0]);
-	// float endMult = pow(decay, sizes[1]);
-	float startMult = 1;
-	float endMult = 1;
+	float decay = 0.98;
+	float startMult = pow(decay, sizes[0]);
+	float endMult = pow(decay, sizes[1]);
+	// float startMult = 1;
+	// float endMult = 1;
 
 	int uvpos = 0;
     // Generate cylinder vertices

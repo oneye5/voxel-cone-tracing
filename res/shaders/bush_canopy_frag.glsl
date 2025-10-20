@@ -63,7 +63,7 @@ void main() {
     MaterialData m;
     m.pos = worldPos;
     m.nrm = normal;
-    m.alb = texture2D(colourTexture, uvCoord).rgb;
+    m.alb = vec3(0.9, 0.9, 0.5) + vec3(0.1, 0.1, 0.1) * texture2D(colourTexture, uvCoord).g;
     m.emi = vec3(0.0);		
     m.mtl = 0.0;		// 0 for non-metalic surfaces
     m.smoothness = 0.15;	// can be thought of as shinyness, eg concrete has a low value

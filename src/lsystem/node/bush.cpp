@@ -65,7 +65,7 @@ namespace lsystem::node::bush {
 	void Leaf::render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		(void)trunk;
 		vec4 a = stack.back().trans * vec4{0,0,0,1};
-		stack.back().trans = translate(stack.back().trans, vec3{0, 0.4, 0});
+		stack.back().trans = translate(stack.back().trans, vec3{0, 0, 1.0});
 		vec4 b = stack.back().trans * vec4{0,0,0,1};
 		vec4 norm = normalize(b-a);
 		canopy.push_index(canopy.push_vertex({a, vec3{norm}}));
@@ -74,7 +74,7 @@ namespace lsystem::node::bush {
 	void Branch::render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		(void)canopy;
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
-		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size, 0});
+		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size * pow(0.9, stack.back().step), 0});
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
 		stack.back().steps->push_back(stack.back().step);
 		stack.back().step += 1;
