@@ -19,15 +19,40 @@ namespace lsystem::node::tree {
 	Leaf::~Leaf() {}
 	std::vector<std::shared_ptr<const Node>> Leaf::grow(std::shared_ptr<const Node> self, std::minstd_rand& rng) const {
 		std::vector<std::shared_ptr<const Node>> ret;
-		ret.push_back(branch);                                     // F
-		ret.push_back(push);                                       // [
-		ret.push_back(std::make_shared<RotateX>(0.3));         // +
-		ret.push_back(leaf);                                       // A
-		ret.push_back(pop);                                        // ]
-		ret.push_back(push);                                       // [
-		ret.push_back(std::make_shared<RotateX>(-0.3));            // -
-		ret.push_back(leaf);                                       // A
-		ret.push_back(pop);                                        // ]
+		ret.push_back(branch);                                      // F
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateX>(0.3));              // +
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateZ>(0.3));              // +
+		ret.push_back(leaf);                                        // A
+		ret.push_back(pop);                                         // ]
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateZ>(-0.6));             // --
+		ret.push_back(leaf);                                        // A
+		ret.push_back(pop);                                         // ]
+
+		ret.push_back(pop);                                         // ]
+
+		ret.push_back(std::make_shared<RotateY>(0.9));              // ???
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateX>(-0.3));             // -
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateZ>(0.3));              // +
+		ret.push_back(leaf);                                        // A
+		ret.push_back(pop);                                         // ]
+
+		ret.push_back(push);                                        // [
+		ret.push_back(std::make_shared<RotateZ>(-0.6));             // --
+		ret.push_back(leaf);                                        // A
+		ret.push_back(pop);                                         // ]
+
+		ret.push_back(pop);                                         // ]
+
 		return ret;
 	}
 
