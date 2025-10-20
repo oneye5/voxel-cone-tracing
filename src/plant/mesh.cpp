@@ -31,5 +31,14 @@ void Mesh::setProjViewUniforms(const glm::mat4& view, const glm::mat4& proj) con
 void Mesh::draw() {
 	// TODO: textures or whatever
 	if (!planttt) return;
+
+	glUseProgram(shader);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, colour_texture);
+	glUniform1i(glGetUniformLocation(shader, "colourTexture"), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, normal_texture);
+	glUniform1i(glGetUniformLocation(shader, "normalTexture"), 1);
+
 	mesh.draw();
 }

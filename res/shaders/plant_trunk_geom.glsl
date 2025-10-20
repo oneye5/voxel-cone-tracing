@@ -15,6 +15,7 @@ in vec3 inNormal[];
 in float sizes[];
 out vec3 worldPos;
 out vec3 normal;
+out vec2 uvCoord;
 
 
 // uniform mat4 projection;
@@ -46,6 +47,7 @@ void main() {
 	float startMult = pow(decay, sizes[0]);
 	float endMult = pow(decay, sizes[1]);
 
+	int uvpos = 0;
     // Generate cylinder vertices
     for (int i = 0; i <= 8; i++) {
         float angle = i * (2.0 * 3.14159 / 8.0);
@@ -53,13 +55,17 @@ void main() {
 
         // Bottom circle
         gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(start.xyz + (offset * startMult), 1.0);
+		uvCoord = vec2((angle / 6.283185308)/8, 0);
 		worldPos = inWorldPos[0];
 		normal = normalize(offset);
         EmitVertex();
+	
+	uvpos += 1;
 
         // Top circle
         gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(end.xyz + (offset * endMult), 1.0);
 		worldPos = inWorldPos[1];
+		uvCoord = vec2((angle / 6.283185308)/8, 1);
 		normal = normalize(offset);
         EmitVertex();
     }

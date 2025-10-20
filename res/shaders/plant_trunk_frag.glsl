@@ -10,6 +10,9 @@ uniform int   uRenderMode; // 0 = voxelize, 1 = gbuffer
 uniform vec3 uVoxelCenter;
 uniform int uVoxelSplatRadius;
 
+uniform sampler2D colourTexture;
+uniform sampler2D normalTexture;
+
 layout(location = 0) out vec4 gPosition; // world position.xyz + metallic
 layout(location = 1) out vec4 gNormal;   // world normal.xyz + smoothness
 layout(location = 2) out vec4 gAlbedo;   // albedo.rgb + emissiveFactor
@@ -17,6 +20,7 @@ layout(location = 3) out vec4 gEmissive; // emissive.rgb + spare channel
 
 in vec3 worldPos;
 in vec3 normal; // must be world space
+in vec2 uvCoord;
 out vec4 fragColor;
 
 struct MaterialData {
@@ -59,7 +63,7 @@ void main() {
     MaterialData m;
     m.pos = worldPos;
     m.nrm = normal;
-    m.alb = vec3(0.278, 0.231, 0.184);
+    m.alb = texture2D(colourTexture, uvCoord).rgb;
     m.emi = vec3(0.0);		
     m.mtl = 0.0;		// 0 for non-metalic surfaces
     m.smoothness = 0.10;	// can be thought of as shinyness, eg concrete has a low value
