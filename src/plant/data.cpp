@@ -1,5 +1,6 @@
 #include "plant/data.hpp"
 #include "lsystem/node/tree.hpp"
+#include "lsystem/node/bush.hpp"
 #include "cgra/cgra_shader.hpp"
 #include <memory>
 
@@ -28,9 +29,32 @@ static void tree(PlantData &data) {
 	data.trunk_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//bark//wood_0025_normal_opengl_1k.jpg").uploadTexture();
 	data.canopy_texture_colour = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_color_1k.jpg").uploadTexture();
 	data.canopy_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_normal_opengl_1k.jpg").uploadTexture();
-	
+}
+
+static void bush(PlantData &data) {
+	data.initial = lsystem::ruleset{lsystem::node::bush::vertical};
+	{
+		cgra::shader_builder sb;
+		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_trunk_vert.glsl"));
+		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_trunk_frag.glsl"));
+		sb.set_shader(GL_GEOMETRY_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_trunk_geom.glsl"));
+		data.trunk_shader = sb.build();
+	}
+	{
+		cgra::shader_builder sb;
+		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_canopy_vert.glsl"));
+		sb.set_shader(GL_GEOMETRY_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_canopy_geom.glsl"));
+		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_canopy_frag.glsl"));
+		data.canopy_shader = sb.build();
+	}
+
+	data.trunk_texture_colour = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//bark//wood_0025_color_1k.jpg").uploadTexture();
+	data.trunk_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//bark//wood_0025_normal_opengl_1k.jpg").uploadTexture();
+	data.canopy_texture_colour = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_color_1k.jpg").uploadTexture();
+	data.canopy_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_normal_opengl_1k.jpg").uploadTexture();
 }
 
 void plant::data::init_known_plants() {
 	tree(known_plants.tree);
+	bush(known_plants.bush);
 }

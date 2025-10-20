@@ -5,6 +5,8 @@ set(sources
 	"node/node.hpp"
 	"node/tree.cpp"
 	"node/tree.hpp"
+	"node/bush.cpp"
+	"node/bush.hpp"
 )
 
 

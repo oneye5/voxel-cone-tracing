@@ -89,6 +89,10 @@ void PlantManager::update_plants(const std::vector<plants_manager_input>& inputs
 				// Tree
 				data = &data::known_plants.tree;
 				break;
+			case 2:
+				// Tree
+				data = &data::known_plants.bush;
+				break;
 		}
 		Plant p = Plant(*data);
 		// Clip into the ground to avoid weird stuff

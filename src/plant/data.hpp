@@ -17,6 +17,7 @@ namespace plant::data {
 
 	struct KnownPlants{
 		PlantData tree;
+		PlantData bush;
 	};
 
 	extern KnownPlants known_plants;
