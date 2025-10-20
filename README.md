@@ -1,6 +1,10 @@
 # IMPORTANT NOTE
 The project may not work on intel / AMD GPU's or any GPU's that have less than 2gb of VRAM. The program is tested to work on mid/low end NVDIA GPU's.
 
+# General controls 
+wasd + space + ctrl for camera movement <br>
+click and drag to rotate the camera
+
 # IMGUI controls:
 ## Renderer settings:
 Re-voxelize:	Updates the voxel representation of the scene, should be done after any geometry changes.<br>
