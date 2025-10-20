@@ -23,6 +23,12 @@ static void tree(PlantData &data) {
 		sb.set_shader(GL_FRAGMENT_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_canopy_frag.glsl"));
 		data.canopy_shader = sb.build();
 	}
+
+	data.trunk_texture_colour = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//bark//wood_0025_color_1k.jpg").uploadTexture();
+	data.trunk_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//bark//wood_0025_normal_opengl_1k.jpg").uploadTexture();
+	data.canopy_texture_colour = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_color_1k.jpg").uploadTexture();
+	data.canopy_texture_normal = cgra::rgba_image(CGRA_SRCDIR "//res//textures//plant//leaf//plants_0001_normal_opengl_1k.jpg").uploadTexture();
+	
 }
 
 void plant::data::init_known_plants() {

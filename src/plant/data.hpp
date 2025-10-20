@@ -2,13 +2,17 @@
 #include <vector>
 #include "lsystem.hpp"
 #include "opengl.hpp"
+#include "cgra/cgra_image.hpp"
 
 namespace plant::data {
 	struct PlantData {
 		lsystem::ruleset initial;
 		GLuint trunk_shader;
 		GLuint canopy_shader;
-		// TODO: Textures?
+		GLuint trunk_texture_colour;
+		GLuint trunk_texture_normal;
+		GLuint canopy_texture_colour;
+		GLuint canopy_texture_normal;
 	};
 
 	struct KnownPlants{
