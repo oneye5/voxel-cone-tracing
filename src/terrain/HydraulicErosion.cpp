@@ -229,11 +229,6 @@ void HydraulicErosion::simulate(int iterations) {
 	for (int i = 0; i < iterations; i++) {
 		c_particle = createParticle();
 		simulateDroplet(settings.max_lifetime);
-
-		// Optional: progress feedback every 1000 iterations
-		if (i % 1000 == 0 && i > 0) {
-			// TODO - add some callback or smth later (but probs not lmao)
-		}
 	}
 }
 

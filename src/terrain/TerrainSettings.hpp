@@ -38,6 +38,9 @@ namespace Terrain {
 		float domain_fractal_lacunarity = 2.0f;
 		float domain_fractal_gain = 0.5f;
 
+		float offset_x = 0.0f;
+		float offset_y = 0.0f;
+
 		// Print out settings in struct form to stdout
 		// TODO - add domain warp stuff
 		void printSettings() const {
@@ -315,7 +318,7 @@ namespace Terrain {
 			{"lots O Circles (Domain Warp)", lotsOCircles},
 			{"Funny Ridges", funnyRidges},
 			{"Big Circle (Domain Warp)", bigCircle},
-			{"Nice Lumpy Hills (Adjust amplitude)", niceLumpyHills},
+			{"Nice Lumpy Hills (1.5 amplitude looks nice here)", niceLumpyHills},
 			{"Single big hill", singleBigHill}
 		};
 	}

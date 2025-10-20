@@ -17,7 +17,6 @@ namespace Terrain {
 
 	struct TerrainSettings {
 		float max_height = 1.0f; // Max height of the terrain
-		float min_height = 0.0; // Min height of the terrain
 		float amplitude = 1.0f; // Amplitude of the height generation
 		float sea_level = 0.0f; // The y level to draw the water plane at
 
@@ -91,7 +90,6 @@ namespace Terrain {
 		glm::mat4 getModelTransform() override;
 
 		// Calculate new tree placement positions based on tree_settings and send the data to the plant manager
-		// TODO - obviously implement the sending to the plant manager thing
 		void calculateAndSendTreePlacements(int seed = -1);
 		// Basic function to send a vector of tree positions to the tree manager, send empty to prevent trees maybe
 		void sendTreePlacements(std::vector<plant::plants_manager_input> &positions);

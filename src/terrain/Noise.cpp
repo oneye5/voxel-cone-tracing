@@ -37,7 +37,7 @@ Noise::Noise() {
 void Noise::makeEditUI(bool use_own_window) {
 	if (use_own_window) {
 		ImGui::SetNextWindowPos(ImVec2(400, 5), ImGuiCond_Once);
-		ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Once);
 		ImGui::Begin("Noise", 0);
 	}
 
@@ -59,6 +59,9 @@ void Noise::makeEditUI(bool use_own_window) {
 	ImGui::Text("General Settings");
 	
 	bool settings_updated = false;
+
+	settings_updated |= ImGui::DragFloat("Noise X Offset", &settings.offset_x, 0.5f, 0.0f);
+	settings_updated |= ImGui::DragFloat("Noise Y Offset", &settings.offset_y, 0.5f, 0.0f);
 
 	// ------- Noise Type -----
 	
@@ -229,8 +232,8 @@ void Noise::generateHeightmap(bool update_pixels) {
 	float local_min = 1.0f;
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			float fx = static_cast<float>(x);
-			float fy = static_cast<float>(y);
+			float fx = static_cast<float>(x) + settings.offset_x;
+			float fy = static_cast<float>(y) + settings.offset_y;
 			
 			// Apply domain warping if enabled
 			if (settings.use_domain_warp) {
