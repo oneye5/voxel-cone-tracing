@@ -4,6 +4,7 @@
 #include "plant/data.hpp"
 #include "opengl.hpp"
 #include <ostream>
+#include <random>
 #include <string>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -85,11 +86,19 @@ void PlantManager::update_plants(const std::vector<plants_manager_input>& inputs
 	this->clear();
 	std::vector<Plant> temp_plants;
 
+	std::minstd_rand rng;
+
 	for (auto pt : inputs) {
 		data::PlantData *data;
 		switch (pt.type) {
 			case 0:
-				// TODO: Random/log
+				if (std::generate_canonical<float, 10>(rng) < 0.5) {
+					data = &data::known_plants.tree;
+				} else {
+					data = &data::known_plants.bush;
+					pt.pos += vec3{0,0.2, 0};
+				}
+				break;
 			case 1:
 				// Tree
 				data = &data::known_plants.tree;
@@ -100,8 +109,6 @@ void PlantManager::update_plants(const std::vector<plants_manager_input>& inputs
 				break;
 		}
 		Plant p = Plant(*data);
-		// Clip into the ground to avoid weird stuff
-		pt.pos -= vec3{0,0.1, 0};
 		p.trunk.modelTransform = translate(p.trunk.modelTransform, pt.pos);
 		p.canopy.modelTransform = translate(p.canopy.modelTransform, pt.pos);
 		temp_plants.push_back(p);

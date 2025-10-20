@@ -21,7 +21,7 @@ namespace lsystem::node::tree {
 		std::vector<std::shared_ptr<const Node>> ret;
 		ret.push_back(branch);                                      // F
 		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateY>(0.0, 0.4));              // ???
+		ret.push_back(std::make_shared<RotateY>(-0.20, 0.1));              // ???
 		ret.push_back(leaf);
 		ret.push_back(pop);
 

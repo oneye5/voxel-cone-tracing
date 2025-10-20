@@ -25,6 +25,7 @@ namespace lsystem::node::bush {
 		std::vector<std::shared_ptr<const Node>> ret;
 
 		/* V */ret.push_back(vertical);
+		/* + */ret.push_back(std::make_shared<RotateZ>(0.05, 0.1));
 		/* & */ret.push_back(std::make_shared<RotateY>(0.0f, 1.0));
 		/* [ */ret.push_back(push);
 		/* & */ret.push_back(std::make_shared<RotateY>(0.0f, 1.0));
