@@ -2,8 +2,8 @@
 The project may not work on intel / AMD GPU's or any GPU's that have less than 2gb of VRAM. The program is tested to work on mid/low end NVDIA GPU's.
 
 # General controls 
-wasd + space + ctrl for camera movement <br>
-click and drag to rotate the camera
+Wasd + space + ctrl for camera movement. <br>
+Click and drag to rotate the camera.
 
 # IMGUI controls:
 ## Renderer settings:
