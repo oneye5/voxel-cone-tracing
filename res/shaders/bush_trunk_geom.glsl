@@ -23,7 +23,7 @@ out vec2 uvCoord;
 // uniform mat4 model;
 
 // Cylinder radius
-uniform float lineRadius = 0.1;
+uniform float lineRadius = 0.003;
 
 // // Input vertices from vertex shader
 // in vec3 vertexColor[];
@@ -44,8 +44,10 @@ void main() {
     vec3 right = normalize(cross(lineDir, up));
     up = normalize(cross(right, lineDir));
 	float decay = 0.5;
-	float startMult = pow(decay, sizes[0]);
-	float endMult = pow(decay, sizes[1]);
+	// float startMult = pow(decay, sizes[0]);
+	// float endMult = pow(decay, sizes[1]);
+	float startMult = 1;
+	float endMult = 1;
 
 	int uvpos = 0;
     // Generate cylinder vertices

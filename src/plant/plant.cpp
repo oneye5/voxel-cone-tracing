@@ -17,13 +17,14 @@ using namespace glm;
 Plant::Plant(lsystem::ruleset current, GLuint trunk_shader, GLuint canopy_shader, unsigned long rng_seed, int steps) :
 	rng{rng_seed},
 	current{current},
+	size{0.5},
 	trunk{trunk_shader, 0, 0},
 	canopy{canopy_shader, 0, 0} {
 	grow(steps);
 }
 
 Plant::Plant(data::PlantData data, int steps) :
-		current{data.initial},
+		current{data.initial}, size{data.size},
 		trunk{data.trunk_shader, data.trunk_texture_colour, data.trunk_texture_normal},
 		canopy{data.canopy_shader, data.canopy_texture_colour, data.canopy_texture_normal} {
 	grow(steps);
@@ -42,7 +43,6 @@ void Plant::recalculate_mesh() {
 
 	float step = 1;
 	static float angle = 0.3;
-	float size = 0.5;
 	mat4 trans = mat4(1);
 	std::vector<float> steps;
 	std::vector<lsystem::node::node_stack> stack = {{trans, size, step, &steps}};

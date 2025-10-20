@@ -14,6 +14,7 @@ namespace plant {
 		std::minstd_rand rng;
 		lsystem::ruleset current;
 		void recalculate_mesh();
+		float size;
 
 		public:
 		Mesh trunk;

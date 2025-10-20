@@ -19,38 +19,27 @@ namespace lsystem::node::bush {
 	Branch::~Branch() {}
 	Leaf::~Leaf() {}
 
+	const float rot = 0.5;
+
 	std::vector<std::shared_ptr<const Node>> Vertical::grow(std::shared_ptr<const Node> self, std::minstd_rand& rng) const {
 		std::vector<std::shared_ptr<const Node>> ret;
 
-		ret.push_back(vertical);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(half_pi<float>(), 0.2));
-		ret.push_back(std::make_shared<RotateX>(two_pi<float>()/3.0, 0.2));
-		ret.push_back(branch);
-		ret.push_back(leaf);
-		ret.push_back(pop);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(half_pi<float>(), 0.2));
-		ret.push_back(std::make_shared<RotateX>(two_pi<float>()* 2.0/3.0, 0.2));
-		ret.push_back(branch);
-		ret.push_back(leaf);
-		ret.push_back(pop);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(half_pi<float>(), 0.2));
-		ret.push_back(std::make_shared<RotateX>(0, 0.2));
-		ret.push_back(branch);
-		ret.push_back(leaf);
-		ret.push_back(pop);
-
-		ret.push_back(vertical);
-
-		ret.push_back(push);
-		ret.push_back(leaf);
-		ret.push_back(leaf);
-		ret.push_back(pop);
+		/* V */ret.push_back(vertical);
+		/* & */ret.push_back(std::make_shared<RotateY>(0.0f, 1.0));
+		/* [ */ret.push_back(push);
+		/* & */ret.push_back(std::make_shared<RotateY>(0.0f, 1.0));
+		/* + */ret.push_back(std::make_shared<RotateZ>(rot, 0.3));
+		/* L */ret.push_back(leaf);
+		/* ] */ret.push_back(pop);
+		/* B */ret.push_back(branch);
+		/* [ */ret.push_back(push);
+		/* & */ret.push_back(std::make_shared<RotateY>(0.0f, 1.0));
+		/* + */ret.push_back(std::make_shared<RotateZ>(rot, 0.3));
+		/* B */ret.push_back(branch);
+		/* + */ret.push_back(std::make_shared<RotateZ>(rot, 0.3));
+		/* L */ret.push_back(leaf);
+		/* ] */ret.push_back(pop);
+		/* B */ret.push_back(branch);
 
 		return ret;
 	}
@@ -58,51 +47,9 @@ namespace lsystem::node::bush {
 	std::vector<std::shared_ptr<const Node>> Leaf::grow(std::shared_ptr<const Node> self, std::minstd_rand& rng) const {
 		std::vector<std::shared_ptr<const Node>> ret;
 
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateX>(1.00, 0.05));
 		ret.push_back(branch);
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(-half_pi<float>(), 0.2));
-		ret.push_back(leaf);
-		ret.push_back(pop);
-		ret.push_back(pop);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateX>(-1.00, 0.05));
-		ret.push_back(branch);
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(-half_pi<float>(), 0.2));
-		ret.push_back(leaf);
-		ret.push_back(pop);
-		ret.push_back(pop);
-
-		ret.push_back(branch);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateX>(1.00, 0.05));
-		ret.push_back(branch);
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(-half_pi<float>(), 0.2));
-		ret.push_back(leaf);
-		ret.push_back(pop);
-		ret.push_back(pop);
-
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateX>(-1.00, 0.05));
-		ret.push_back(branch);
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(-half_pi<float>(), 0.2));
-		ret.push_back(leaf);
-		ret.push_back(pop);
-		ret.push_back(pop);
-
-		ret.push_back(push);
-		ret.push_back(branch);
-		ret.push_back(push);
-		ret.push_back(std::make_shared<RotateZ>(-half_pi<float>(), 0.2));
-		ret.push_back(leaf);
-		ret.push_back(pop);
-		ret.push_back(pop);
+		/* + */ret.push_back(std::make_shared<RotateZ>(rot, 0.3));
+		ret.push_back(self);
 
 		return ret;
 	}
@@ -127,24 +74,24 @@ namespace lsystem::node::bush {
 	void Branch::render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		(void)canopy;
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
-		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size/4, 0});
+		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size, 0});
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
 		stack.back().steps->push_back(stack.back().step);
 		stack.back().step += 1;
 		stack.back().steps->push_back(stack.back().step);
 
-		stack.back().size *= 0.9;
+		stack.back().size *= 1;
 	}
 
 	void Vertical::render(std::vector<node_stack> &stack, cgra::mesh_builder &trunk, cgra::mesh_builder &canopy) const {
 		(void)canopy;
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
-		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size / 4.0, 0});
+		stack.back().trans = translate(stack.back().trans, vec3{0, stack.back().size, 0});
 		trunk.push_index(trunk.push_vertex({{stack.back().trans * vec4{0,0,0,1}}, {0,0,1}}));
 		stack.back().steps->push_back(stack.back().step);
 		stack.back().step += 1;
 		stack.back().steps->push_back(stack.back().step);
 
-		stack.back().size *= 0.9;
+		stack.back().size *= 1;
 	}
 }

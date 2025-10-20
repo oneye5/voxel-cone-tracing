@@ -7,6 +7,7 @@
 namespace plant::data {
 	struct PlantData {
 		lsystem::ruleset initial;
+		float size;
 		GLuint trunk_shader;
 		GLuint canopy_shader;
 		GLuint trunk_texture_colour;

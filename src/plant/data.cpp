@@ -1,15 +1,19 @@
 #include "plant/data.hpp"
+#include "lsystem/node/common.hpp"
 #include "lsystem/node/tree.hpp"
 #include "lsystem/node/bush.hpp"
 #include "cgra/cgra_shader.hpp"
 #include <memory>
 
 using namespace plant::data;
+using lsystem::node::common::RotateZ;
+using lsystem::node::common::RotateY;
 
 KnownPlants plant::data::known_plants;
 
 static void tree(PlantData &data) {
 	data.initial = lsystem::ruleset{lsystem::node::tree::leaf};
+	data.size = 0.5;
 	{
 		cgra::shader_builder sb;
 		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//plant_trunk_vert.glsl"));
@@ -32,7 +36,8 @@ static void tree(PlantData &data) {
 }
 
 static void bush(PlantData &data) {
-	data.initial = lsystem::ruleset{lsystem::node::bush::vertical};
+	data.initial = lsystem::ruleset{std::make_shared<RotateY>(0.0f, 6.283185307f), lsystem::node::bush::vertical, std::make_shared<RotateZ>(0.5, 0.3), lsystem::node::bush::branch, lsystem::node::bush::leaf};
+	data.size = 0.1;
 	{
 		cgra::shader_builder sb;
 		sb.set_shader(GL_VERTEX_SHADER, CGRA_SRCDIR + std::string("//res//shaders//bush_trunk_vert.glsl"));
