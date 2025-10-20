@@ -42,7 +42,7 @@ void Plant::recalculate_mesh() {
 
 	float step = 1;
 	static float angle = 0.3;
-	float size = 1;
+	float size = 0.5;
 	mat4 trans = mat4(1);
 	std::vector<float> steps;
 	std::vector<lsystem::node::node_stack> stack = {{trans, size, step, &steps}};
