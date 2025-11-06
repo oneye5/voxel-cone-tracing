@@ -4,7 +4,7 @@ This is a group project between me and two other students, where my teammates we
 <img width="871" height="876" alt="image" src="https://github.com/user-attachments/assets/43967028-30a1-4e4a-b23c-b1b6286078f3" />
 
 # IMPORTANT NOTE
-The project may not work on intel / AMD GPU's or any GPU's that have less than 2gb of VRAM. The program is tested to work on mid/low end NVDIA GPU's. Build process remains mostly the same as the CGRA framework, instructions on this are below.
+The project may not work on Intel / AMD GPU's or any GPU's that have less than 2gb of VRAM. The program is tested to work on mid/low end NVDIA GPU's. Build process remains mostly the same as the CGRA framework, instructions on this are below.
 
 # General controls 
 Wasd + space + ctrl for camera movement. <br>
